@@ -1,6 +1,8 @@
 package main
 
 import (
+	"AmphionLand/components"
+
 	"github.com/cadmean-ru/amphion/engine"
 )
 
@@ -9,5 +11,5 @@ func main() {
 }
 
 func registerComponents(cm *engine.ComponentsManager) {
-
+	cm.RegisterComponentType(&components.TestComponent{})
 }
