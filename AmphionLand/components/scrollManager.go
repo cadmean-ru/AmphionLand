@@ -20,10 +20,21 @@ func (s *Scrolling) OnInit(ctx engine.InitContext) {
 		event.Call("preventDefault")
 
 		var deltaY = event.Get("deltaY").Float()
+		var deltaX = event.Get("deltaX").Float()
 
 		engine.LogDebug(fmt.Sprintf("deltaY: %f", deltaY))
+		engine.LogDebug(fmt.Sprintf("deltaX: %f", deltaX))
 
 		s.SceneObject.Transform.Position.Y += float32(deltaY)
+		s.SceneObject.Transform.Position.X += float32(deltaX)
+
+		s.SceneObject.ForEachObject(func(object *engine.SceneObject) {
+			object.ForEachComponent(func(component engine.Component) {
+				if view, ok:= component.(engine.ViewComponent); ok{
+					view.ForceRedraw()
+				}
+			})
+		})
 
 		engine.RequestRendering()
 
