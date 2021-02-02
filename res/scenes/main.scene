@@ -31,8 +31,8 @@ children:
           fontSize: 20
           fontWeight: 0
           text: "Hello, Amphion!"
-components: 
-  - name: AmphionLand/components.TestComponent
+components:
+  - name: AmphionLand/components.Scrolling
     state: {}
 id: 0
 name: Main scene
