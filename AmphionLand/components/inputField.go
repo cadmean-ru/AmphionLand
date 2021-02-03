@@ -16,9 +16,7 @@ type InputField struct {
 
 func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
-
-	peepeepoopoochild := s.SceneObject.GetChildByName("main text")
-	engine.LogDebug(fmt.Sprintf("key: %+v", peepeepoopoochild))
+	
 	s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("github.com/cadmean-ru/amphion/engine/builtin.TextView").(*builtin.TextView)
 	s.Engine.BindEventHandler(engine.EventKeyDown, func(keyDownEvent engine.AmphionEvent) bool {
 		engine.LogDebug(fmt.Sprintf("key: %+v", keyDownEvent.Data))
