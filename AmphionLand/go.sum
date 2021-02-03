@@ -5,6 +5,8 @@ github.com/cadmean-ru/amphion v0.1.1 h1:Uqjq6fSzNtdXiTCx55WnTYnUWdwAsOmCF9rkmo8a
 github.com/cadmean-ru/amphion v0.1.1/go.mod h1:3nTJhDHUnOG82D7jGN5as9e6CzM45d4EmQuJ6aDEt48=
 github.com/cadmean-ru/amphion v0.1.2 h1:Bztigxhi15IAGhV3tmYKdfC8x9kPG/Og2RgEHsUaCc0=
 github.com/cadmean-ru/amphion v0.1.2/go.mod h1:3nTJhDHUnOG82D7jGN5as9e6CzM45d4EmQuJ6aDEt48=
+github.com/cadmean-ru/amphion v0.1.4 h1:mR4oNXItUj1cQ8YUMEj/N3qJLikdDZHrOWZNn8M93dM=
+github.com/cadmean-ru/amphion v0.1.4/go.mod h1:3nTJhDHUnOG82D7jGN5as9e6CzM45d4EmQuJ6aDEt48=
 github.com/cadmean-ru/goRPCKit v0.1.0/go.mod h1:uIUJQ4OmonM2uxQ0/jhA6KDdkfqvqAA0QhwSH6ngPRU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
