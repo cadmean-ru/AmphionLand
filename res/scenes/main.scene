@@ -31,10 +31,14 @@ children:
           fontSize: 20
           fontWeight: 0
           text: "Hello, Amphion!"
+      - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
+        state: {}
 components:
   - name: AmphionLand/components.Scrolling
     state: {}
   - name: AmphionLand/components.MainSceneController
+    state: {}
+  - name: AmphionLand/components.Selection
     state: {}
 id: 0
 name: Main scene
