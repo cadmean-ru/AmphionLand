@@ -13,6 +13,7 @@ type Selection struct{
 	engine.ComponentImpl
 	color a.Color
 	componentData *builtin.TextView
+	flag bool
 }
 
 func (s *Selection) OnInit(ctx engine.InitContext) {
@@ -22,7 +23,6 @@ func (s *Selection) OnInit(ctx engine.InitContext) {
 		//engine.LogDebug(fmt.Sprintf("data: %+v", selectionEvent.Data.(engine.MouseEventData).SceneObject.GetName()))
 
 		sceneObject := selectionEvent.Data.(engine.MouseEventData).SceneObject
-		flag := false
 
 		if sceneObject != nil {
 
@@ -33,15 +33,18 @@ func (s *Selection) OnInit(ctx engine.InitContext) {
 
 					s.color = view.TextColor
 					view.TextColor = a.RedColor()
-					view.ForceRedraw()
 
-					flag = true
+					s.flag = true
+					view.ForceRedraw()
 					engine.RequestRendering()
 				}
 			})
-		} else if flag == true{
-			flag = false
+		} else if s.flag{
+			s.flag = false
 			s.componentData.TextColor = s.color
+
+			s.componentData.ForceRedraw()
+			engine.RequestRendering()
 		}
 
 
