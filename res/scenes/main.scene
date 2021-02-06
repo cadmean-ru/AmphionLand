@@ -33,6 +33,11 @@ children:
           text: "Hello, Amphion!"
       - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
         state: {}
+      - name: AmphionLand/components.Zooming
+        state:
+                 ZoomNumber: 5
+                 EventOn: -14
+                 EventOff: -15
 components:
   - name: AmphionLand/components.Scrolling
     state: {}
