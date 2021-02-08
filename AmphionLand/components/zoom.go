@@ -18,7 +18,7 @@ type Zooming struct {
 func (s *Zooming) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 	s.SceneObject.AddComponent(builtin.NewEventListener(s.EventOn,
-		func(nokeyDownEvent engine.AmphionEvent) bool{
+		func(keyDownEvent engine.AmphionEvent) bool{
 			for _, component:= range s.SceneObject.GetComponentsByName(".*TextView"){
 				if view, ok := component.(*builtin.TextView); ok {
 					view.FontSize *= byte(s.ZoomNumber)
