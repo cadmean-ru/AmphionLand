@@ -15,4 +15,5 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.InputField{})
 	cm.RegisterComponentType(&components.MainSceneController{})
 	cm.RegisterComponentType(&components.Selection{})
+	cm.RegisterComponentType(&components.Zooming{})
 }
