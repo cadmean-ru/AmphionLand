@@ -40,6 +40,31 @@ children:
                  EventOff: -15
       - name: github.com/cadmean-ru/amphion/engine/builtin.BoundaryView
         state: {}
+  - children: [ ]
+    id: 2
+    name: imaage
+    transform:
+      pivot:
+        x: 0
+        "y": 0
+        z: 0
+      position:
+        x: 0
+        "y": 300
+        z: 0
+      rotation:
+        x: 0
+        "y": 0
+        z: 0
+      size:
+        x: -2147483648
+        "y": -2147483648
+        z: 0
+    components:
+      - name: github.com/cadmean-ru/amphion/engine/builtin.ImageView
+        state:
+          resId: -1
+          imageUrl: "images/babyyoda2.png"
 components:
   - name: AmphionLand/components.Scrolling
     state: {}
