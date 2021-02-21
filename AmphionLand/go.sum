@@ -11,6 +11,10 @@ github.com/cadmean-ru/amphion v0.1.5 h1:hr8KYqv7riVaD6myQZGfVHTxBvnZYTTN/aLM11Ul
 github.com/cadmean-ru/amphion v0.1.5/go.mod h1:3nTJhDHUnOG82D7jGN5as9e6CzM45d4EmQuJ6aDEt48=
 github.com/cadmean-ru/amphion v0.1.6 h1:06yKW7+8insPz9d8JYseKX7w0MfYkYeTpzArmq0lRgc=
 github.com/cadmean-ru/amphion v0.1.6/go.mod h1:3nTJhDHUnOG82D7jGN5as9e6CzM45d4EmQuJ6aDEt48=
+github.com/cadmean-ru/amphion v0.1.7 h1:eF085bVBF/BByep+UQu7WYgCQc6UQPpgtmtsdb6BqY4=
+github.com/cadmean-ru/amphion v0.1.7/go.mod h1:3nTJhDHUnOG82D7jGN5as9e6CzM45d4EmQuJ6aDEt48=
+github.com/cadmean-ru/amphion v0.1.8 h1:6vHV+mvaYIKaNDyvMT/J2E8S3puiUjv2AakmN2+0/E4=
+github.com/cadmean-ru/amphion v0.1.8/go.mod h1:3nTJhDHUnOG82D7jGN5as9e6CzM45d4EmQuJ6aDEt48=
 github.com/cadmean-ru/goRPCKit v0.1.0/go.mod h1:uIUJQ4OmonM2uxQ0/jhA6KDdkfqvqAA0QhwSH6ngPRU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
