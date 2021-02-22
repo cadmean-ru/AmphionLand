@@ -1,7 +1,7 @@
 children:
   - children: []
     id: 1
-    name: yeet-n-grid
+    name: main wodget
     transform:
       pivot:
         x: 0
@@ -16,21 +16,26 @@ children:
         "y": 0
         z: 0
       size:
-        x: -2147483648
-        "y": -2147483648
+        x: 100
+        "y": 100
         z: 0
     components:
-      - name: AmphionLand/components.WidgetGrid
+      - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
         state:
-          rowPadding: 20
-          colPadding: 50
+          textColor: "#abcdef69"
+          font: "C o m i  c  S a n s"
+          fontSize: 69
+          fontWeight: 0
+          text: "breh"
 components:
+  - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
+    state: { }
   - name: github.com/cadmean-ru/amphion/engine/builtin.BoundaryView
     state: { }
-  - name: AmphionLand/components.LoginSceneController
+  - name: AmphionLand/components.WodgetController
     state: { }
 id: 0
-name: Login
+name: Wodget
 transform:
   pivot:
     x: 0
@@ -45,6 +50,6 @@ transform:
     "y": 0
     z: 0
   size:
-    x: 1
-    "y": 1
-    z: 1
+    x: 100
+    "y": 200
+    z: 0

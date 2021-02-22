@@ -20,6 +20,8 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.Zooming{})
 	cm.RegisterComponentType(&components.LoginSceneController{})
 	cm.RegisterComponentType(&builtin.NativeInputView{})
+	cm.RegisterComponentType(&components.WidgetGrid{})
+	cm.RegisterComponentType(&components.WodgetController{})
 
 	rpc.Initialize("http://localhost:4200")
 }
