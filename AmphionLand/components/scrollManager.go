@@ -25,19 +25,19 @@ func (s *Scrolling) OnInit(ctx engine.InitContext) {
 		var deltaX, deltaY = float32(event.Get("deltaX").Float()), float32(event.Get("deltaY").Float())
 		//engine.LogDebug("deltaX, deltaY: %f %f", deltaX, deltaY)
 		totalScrollX += deltaX
-		if totalScrollX > viewRect.X.Max{
-			totalScrollX = viewRect.X.Max
+		if totalScrollX > realRect.X.Max{
+			totalScrollX = realRect.X.Max
 		}
-		if totalScrollX < viewRect.X.Min{
-			totalScrollX = viewRect.X.Min
+		if totalScrollX < realRect.X.Min{
+			totalScrollX = realRect.X.Min
 		}
 
 		totalScrollY += deltaY
-		if totalScrollY > viewRect.Y.Max{
-			totalScrollY = viewRect.Y.Max
+		if totalScrollY > realRect.Y.Max{
+			totalScrollY = realRect.Y.Max
 		}
-		if totalScrollY < viewRect.Y.Min{
-			totalScrollY = viewRect.Y.Min
+		if totalScrollY < realRect.Y.Min{
+			totalScrollY = realRect.Y.Min
 		}
 
 		s.SceneObject.ForEachObject(func(object *engine.SceneObject) {

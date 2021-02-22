@@ -45,7 +45,7 @@ children:
         "y": 0
         z: 0
       position:
-        x: 0
+        x: 500
         "y": 1500
         z: -10
       rotation:
@@ -62,7 +62,7 @@ children:
           resId: 2
           imageUrl: ""
 components:
-  - name: AmphionLand/components.Scrolling
+  - name: AmphionLand/components.NewScrolling
     state: {}
   - name: AmphionLand/components.MainSceneController
     state: {}
