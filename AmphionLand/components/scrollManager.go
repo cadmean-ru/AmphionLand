@@ -15,31 +15,47 @@ type Scrolling struct {
 func (s *Scrolling) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
+	var totalScrollX, totalScrollY float32
+
 	js.Global().Get("document").Call("addEventListener", "wheel", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		var event = args[0]
 
 		viewRect := s.Engine.GetCurrentScene().Transform.GetGlobalRect()
 		var realRect common.RectBoundary
+		var deltaX, deltaY = float32(event.Get("deltaX").Float()), float32(event.Get("deltaY").Float())
+		//engine.LogDebug("deltaX, deltaY: %f %f", deltaX, deltaY)
+		totalScrollX += deltaX
+		if totalScrollX > viewRect.X.Max{
+			totalScrollX = viewRect.X.Max
+		}
+		if totalScrollX < viewRect.X.Min{
+			totalScrollX = viewRect.X.Min
+		}
+
+		totalScrollY += deltaY
+		if totalScrollY > viewRect.Y.Max{
+			totalScrollY = viewRect.Y.Max
+		}
+		if totalScrollY < viewRect.Y.Min{
+			totalScrollY = viewRect.Y.Min
+		}
 
 		s.SceneObject.ForEachObject(func(object *engine.SceneObject) {
 			size := object.Transform.GetGlobalRect()
 
-			if size.X.Max > realRect.X.Max {
-				realRect.X.Max = size.X.Max
+			if size.X.Max - totalScrollX > realRect.X.Max {
+				realRect.X.Max = size.X.Max - totalScrollX
 			}
-			if size.X.Min < realRect.X.Min {
-				realRect.X.Min = size.X.Min
+			if size.X.Min - totalScrollX < realRect.X.Min {
+				realRect.X.Min = size.X.Min - totalScrollX
 			}
-			if size.Y.Max > realRect.Y.Max {
-				realRect.Y.Max = size.Y.Max
+			if size.Y.Max - totalScrollY > realRect.Y.Max {
+				realRect.Y.Max = size.Y.Max - totalScrollY
 			}
-			if size.Y.Min < realRect.Y.Min {
-				realRect.Y.Min = size.Y.Min
+			if size.Y.Min - totalScrollY < realRect.Y.Min {
+				realRect.Y.Min = size.Y.Min - totalScrollY
 			}
 		})
-
-		var deltaX, deltaY = float32(event.Get("deltaX").Float()), float32(event.Get("deltaY").Float())
-		//engine.LogDebug("deltaX, deltaY: %f %f", deltaX, deltaY)
 
 		if (viewRect.X.Max + deltaX) > realRect.X.Max {
 			viewRect.X.Max = realRect.X.Max

@@ -21,7 +21,7 @@ func (s *MainSceneController) OnInit(ctx engine.InitContext) {
 }
 
 func (s *MainSceneController) OnStart() {
-	engine.Navigate("login", nil)
+	//engine.Navigate("login", nil)
 }
 
 func (s *MainSceneController) GetName() string {
