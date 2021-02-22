@@ -3,6 +3,8 @@ package main
 import (
 	"AmphionLand/components"
 	"github.com/cadmean-ru/amphion/engine"
+	"github.com/cadmean-ru/amphion/engine/builtin"
+	"github.com/cadmean-ru/amphion/engine/rpc"
 )
 
 func main() {
@@ -16,4 +18,8 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.MainSceneController{})
 	cm.RegisterComponentType(&components.Selection{})
 	cm.RegisterComponentType(&components.Zooming{})
+	cm.RegisterComponentType(&components.LoginSceneController{})
+	cm.RegisterComponentType(&builtin.NativeInputView{})
+
+	rpc.Initialize("http://localhost:4200")
 }

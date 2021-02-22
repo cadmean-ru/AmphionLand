@@ -3,7 +3,7 @@
 package components
 
 import (
-	"AmphionLand/res"
+	"AmphionLand/generated/res"
 	"github.com/cadmean-ru/amphion/engine"
 )
 
@@ -18,6 +18,10 @@ func (s *MainSceneController) OnInit(ctx engine.InitContext) {
 	if ex == nil {
 		s.SceneObject.AddChild(inputBoxPrefab)
 	}
+}
+
+func (s *MainSceneController) OnStart() {
+	engine.Navigate("login", nil)
 }
 
 func (s *MainSceneController) GetName() string {
