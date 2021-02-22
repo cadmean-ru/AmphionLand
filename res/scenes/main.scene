@@ -22,11 +22,7 @@ children:
     components:
       - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
         state:
-          textColor:
-            r: 0
-            g: 0
-            b: 255
-            a: 255
+          textColor: "#000"
           font: ""
           fontSize: 20
           fontWeight: 0
@@ -50,15 +46,15 @@ children:
         z: 0
       position:
         x: 0
-        "y": 3000
-        z: 0
+        "y": 600
+        z: -10
       rotation:
         x: 0
         "y": 0
         z: 0
       size:
-        x: 1000
-        "y": 100
+        x: -2147483648
+        "y": 300
         z: 0
     components:
       - name: github.com/cadmean-ru/amphion/engine/builtin.ImageView
