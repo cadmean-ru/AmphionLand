@@ -22,11 +22,7 @@ children:
     components:
       - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
         state:
-          textColor:
-            r: 0
-            g: 0
-            b: 255
-            a: 255
+          textColor: "#000"
           font: ""
           fontSize: 20
           fontWeight: 0
@@ -35,9 +31,9 @@ children:
         state: {}
       - name: AmphionLand/components.Zooming
         state:
-                 ZoomNumber: 5
-                 EventOn: -14
-                 EventOff: -15
+          ZoomNumber: 5
+          EventOn: -14
+          EventOff: -15
       - name: github.com/cadmean-ru/amphion/engine/builtin.BoundaryView
         state: {}
   - children: [ ]
