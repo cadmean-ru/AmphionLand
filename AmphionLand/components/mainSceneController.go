@@ -18,6 +18,13 @@ func (s *MainSceneController) OnInit(ctx engine.InitContext) {
 	if ex == nil {
 		s.SceneObject.AddChild(inputBoxPrefab)
 	}
+
+	searchBarPrefab, ex := engine.LoadPrefab(res.Prefabs_searchBar)
+	if ex == nil {
+		s.SceneObject.AddChild(searchBarPrefab)
+	} else {
+		engine.LogDebug(ex.Error())
+	}
 }
 
 func (s *MainSceneController) OnStart() {
