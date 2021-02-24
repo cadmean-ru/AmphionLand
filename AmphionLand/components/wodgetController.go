@@ -17,7 +17,11 @@ type WodgetController struct {
 func (s *WodgetController) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
-	engine.LogDebug("Breh brejfkldsjaflk;jasdkfljdsakfsdf;kjsda;ofsdo;fj;dsfjasdiojf")
+	s.SceneObject.ForEachComponent(func(component engine.Component) {
+		engine.LogDebug(component.GetName())
+	})
+
+	engine.LogDebug("Brew breakfast;jackknifed;kinda;offside;fj;distaff")
 
 	//s.SceneObject.AddComponent(builbuiltin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
 	//	s.SceneObject.GetParent().RemoveChild(s.SceneObject)
@@ -36,23 +40,13 @@ func (s *WodgetController) OnInit(ctx engine.InitContext) {
 	//}))
 }
 
-func (s *WodgetController) OnUpdate(_ engine.UpdateContext) {
-	if !s.moving {
-		return
-	}
-
-	newMousePos := s.Engine.GetInputManager().GetMousePosition()
-	dPos := newMousePos.Sub(s.mousePos)
-	s.mousePos = newMousePos
-	s.SceneObject.Transform.Position = s.SceneObject.Transform.Position.Add(dPos.ToFloat3())
-	s.Engine.GetMessageDispatcher().DispatchDown(s.SceneObject, engine.NewMessage(s, engine.MessageRedraw, nil), engine.MessageMaxDepth)
-	s.Engine.RequestRendering()
-}
-
 func (s *WodgetController) OnMessage(msg engine.Message) bool {
+	engine.LogDebug("Brew 2 breakfast;jackknifed;kinda;offside;fj;distaff")
 	if msg.Code != engine.MessageBuiltinEvent || msg.Sender != s.SceneObject {
 		return true
 	}
+
+	engine.LogDebug("Brew 3 breakfast;jackknifed;kinda;offside;fj;distaff")
 
 	event := msg.Data.(engine.AmphionEvent)
 	if event.Code == engine.EventMouseDown {

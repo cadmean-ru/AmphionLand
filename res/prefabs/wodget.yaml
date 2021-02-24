@@ -22,8 +22,8 @@ children:
     components:
       - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
         state:
-          textColor: "#abcdef69"
-          font: "C o m i  c  S a n s"
+          textColor: "#abcdef"
+          font: "C o m i c  S a n s"
           fontSize: 69
           fontWeight: 0
           text: "breh"
@@ -34,6 +34,8 @@ components:
     state: { }
   - name: AmphionLand/components.WodgetController
     state: { }
+  - name: github.com/cadmean-ru/amphion/engine/builtin.MouseMover
+    state: {}
 id: 0
 name: Wodget
 transform:
@@ -44,7 +46,7 @@ transform:
   position:
     x: 0
     "y": 0
-    z: 0
+    z: 500
   rotation:
     x: 0
     "y": 0

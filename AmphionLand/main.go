@@ -22,6 +22,7 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&builtin.NativeInputView{})
 	cm.RegisterComponentType(&components.WidgetGrid{})
 	cm.RegisterComponentType(&components.WodgetController{})
+	cm.RegisterComponentType(&components.EmptyBox{})
 
 	rpc.Initialize("http://localhost:4200")
 }

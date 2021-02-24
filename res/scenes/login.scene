@@ -16,13 +16,15 @@ children:
         "y": 0
         z: 0
       size:
-        x: -2147483648
-        "y": -2147483648
+        x: 500
+        "y": 500
         z: 0
     components:
       - name: AmphionLand/components.WidgetGrid
         state:
-          rowPadding: 20
+          rows: 5
+          cols: 5
+          rowPadding: 50
           colPadding: 50
 components:
   - name: github.com/cadmean-ru/amphion/engine/builtin.BoundaryView
