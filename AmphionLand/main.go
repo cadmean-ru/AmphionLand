@@ -23,6 +23,7 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.WidgetGrid{})
 	cm.RegisterComponentType(&components.WodgetController{})
 	cm.RegisterComponentType(&components.EmptyBox{})
+	cm.RegisterComponentType(&components.SearchAlgorithm{})
 
 	rpc.Initialize("http://localhost:4200")
 }
