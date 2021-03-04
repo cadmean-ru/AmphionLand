@@ -1,5 +1,3 @@
-//+build js
-
 package components
 
 import (
@@ -31,7 +29,9 @@ func (s *WidgetGrid) OnInit(ctx engine.InitContext) {
 		sceneObj.Transform.Size.Y = 100
 		sceneObj.AddComponent(&EmptyBox{})
 		sceneObj.AddComponent(builtin.NewRectBoundary())
-		sceneObj.AddComponent(builtin.NewShapeView(builtin.ShapeEllipse))
+		ell := builtin.NewShapeView(builtin.ShapeEllipse)
+		ell.FillColor = a.NewColor(255, 255, 0)
+		sceneObj.AddComponent(ell)
 		s.SceneObject.AddChild(sceneObj)
 	}
 
