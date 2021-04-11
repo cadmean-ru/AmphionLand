@@ -1,5 +1,3 @@
-//+build js
-
 package components
 
 import (
@@ -9,7 +7,6 @@ import (
 	"github.com/cadmean-ru/amphion/engine/builtin"
 	regregexp "regexp"
 	"strings"
-	"syscall/js"
 )
 
 type InputField struct {
@@ -77,5 +74,6 @@ func (s *InputField) GetName() string {
 }
 
 func GetTextWidth(text string) float32 {
-	return float32(js.Global().Get("textWidth").Invoke(text).Float())
+	//return float32(js.Global().Get("textWidth").Invoke(text).Float())
+	return 0
 }

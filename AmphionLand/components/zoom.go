@@ -1,5 +1,3 @@
-//+build js
-
 package components
 
 import (
@@ -18,7 +16,7 @@ type Zooming struct {
 func (s *Zooming) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 	s.SceneObject.AddComponent(builtin.NewEventListener(s.EventOn,
-		func(keyDownEvent engine.AmphionEvent) bool{
+		func(mouseHoverEvent engine.AmphionEvent) bool{
 			for _, component:= range s.SceneObject.GetComponentsByName(".*TextView"){
 				if view, ok := component.(*builtin.TextView); ok {
 					view.FontSize *= byte(s.ZoomNumber)
@@ -31,7 +29,7 @@ func (s *Zooming) OnInit(ctx engine.InitContext) {
 			return true
 		}))
 	s.SceneObject.AddComponent(builtin.NewEventListener(s.EventOff,
-		func(keyDownEvent engine.AmphionEvent) bool{
+		func(mouseHoverEvent engine.AmphionEvent) bool{
 			for _, component:= range s.SceneObject.GetComponentsByName(".*TextView"){
 				if view, ok := component.(*builtin.TextView); ok {
 					view.FontSize /= byte(s.ZoomNumber)

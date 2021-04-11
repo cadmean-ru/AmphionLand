@@ -69,7 +69,7 @@ components:
   - name: AmphionLand/components.Selection
     state: {}
 id: 0
-name: Main scene
+name: Main scene 2
 transform:
   pivot:
     x: 0

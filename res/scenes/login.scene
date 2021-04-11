@@ -1,35 +1,7 @@
 children:
-  - children: [ ]
-    id: 1
-    name: email label
-    transform:
-      pivot:
-        x: 0
-        "y": 0
-        z: 0
-      position:
-        x: 0
-        "y": 0
-        z: 0
-      rotation:
-        x: 0
-        "y": 0
-        z: 0
-      size:
-        x: -2147483648
-        "y": 50
-        z: 0
-    components:
-      - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
-        state:
-          textColor: "#000"
-          font: ""
-          fontSize: 20
-          fontWeight: 0
-          text: "email:"
   - children: []
-    id: 2
-    name: email input
+    id: 1
+    name: yeet-n-grid
     transform:
       pivot:
         x: 0
@@ -44,70 +16,19 @@ children:
         "y": 0
         z: 0
       size:
-        x: -2147483648
-        "y": 50
+        x: 500
+        "y": 500
         z: 0
     components:
-      - name: github.com/cadmean-ru/amphion/engine/builtin.NativeInputView
-        state: { }
-  - children: [ ]
-    id: 3
-    name: password label
-    transform:
-      pivot:
-        x: 0
-        "y": 0
-        z: 0
-      position:
-        x: 0
-        "y": 0
-        z: 0
-      rotation:
-        x: 0
-        "y": 0
-        z: 0
-      size:
-        x: -2147483648
-        "y": 50
-        z: 0
-    components:
-      - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
+      - name: AmphionLand/components.WidgetGrid
         state:
-          textColor: "#000"
-          font: ""
-          fontSize: 20
-          fontWeight: 0
-          text: "password:"
-  - children: [ ]
-    id: 4
-    name: password input
-    transform:
-      pivot:
-        x: 0
-        "y": 0
-        z: 0
-      position:
-        x: 0
-        "y": 0
-        z: 0
-      rotation:
-        x: 0
-        "y": 0
-        z: 0
-      size:
-        x: -2147483648
-        "y": 50
-        z: 0
-    components:
-      - name: github.com/cadmean-ru/amphion/engine/builtin.NativeInputView
-        state: { }
+          rows: 5
+          cols: 5
+          rowPadding: 50
+          colPadding: 50
 components:
-  - name: github.com/cadmean-ru/amphion/engine/builtin.GridLayout
-    state:
-      cols: 1
-      rows: 69
-      rowPadding: 20
-      colPadding: 50
+  - name: github.com/cadmean-ru/amphion/engine/builtin.BoundaryView
+    state: { }
   - name: AmphionLand/components.LoginSceneController
     state: { }
 id: 0

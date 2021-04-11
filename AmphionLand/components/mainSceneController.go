@@ -1,5 +1,3 @@
-//+build js
-
 package components
 
 import (
@@ -18,10 +16,17 @@ func (s *MainSceneController) OnInit(ctx engine.InitContext) {
 	if ex == nil {
 		s.SceneObject.AddChild(inputBoxPrefab)
 	}
+
+	searchBarPrefab, ex := engine.LoadPrefab(res.Prefabs_searchBar)
+	if ex == nil {
+		s.SceneObject.AddChild(searchBarPrefab)
+	} else {
+		engine.LogDebug(ex.Error())
+	}
 }
 
 func (s *MainSceneController) OnStart() {
-	//engine.Navigate("login", nil)
+	engine.Navigate("login", nil)
 }
 
 func (s *MainSceneController) GetName() string {

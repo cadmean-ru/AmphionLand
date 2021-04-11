@@ -1,6 +1,6 @@
 github.com/4ydx/gltext v0.0.0-20181021030543-84bc6aa204bf/go.mod h1:qOKme4jGGh01m08NlMewJiB6g0TsJ3Uc8iF4Jb5WuCM=
-github.com/cadmean-ru/amphion v0.1.10 h1:E+3A6HqYa2k8PaDVesI7ulqnb+G2WvbYyhQVueEYhqA=
-github.com/cadmean-ru/amphion v0.1.10/go.mod h1:95BaFFgC0SYDUtwcfEX9yT81QX8RJ1i905z/MZ0xQy8=
+github.com/cadmean-ru/amphion v0.1.11 h1:0FmNEQHYFQkLvND0F7NAYiRmTY0buI4r2tR3rE/U78g=
+github.com/cadmean-ru/amphion v0.1.11/go.mod h1:95BaFFgC0SYDUtwcfEX9yT81QX8RJ1i905z/MZ0xQy8=
 github.com/cadmean-ru/goRPCKit v0.1.0 h1:P5Sw8J2qWj9SC36soMbKF3Gppx8AralGrdaav6kQXt8=
 github.com/cadmean-ru/goRPCKit v0.1.0/go.mod h1:uIUJQ4OmonM2uxQ0/jhA6KDdkfqvqAA0QhwSH6ngPRU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
