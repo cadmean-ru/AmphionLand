@@ -32,10 +32,11 @@ children:
 components:
   - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
     state:
-      fillColor: "#696969"
+      fillColor: "#666699"
       strokeColor: "#000"
-      strokeWeight: 0
+      strokeWeight: 1
       pType: 3
+      cornerRadius: 69
 id: 0
 name: Button
 transform:
@@ -46,7 +47,7 @@ transform:
   position:
     x: 100
     "y": 0
-    z: 0
+    z: 2
   rotation:
     x: 0
     "y": 0
@@ -54,4 +55,4 @@ transform:
   size:
     x: 100
     "y": 200
-    z: 1
+    z: 0
