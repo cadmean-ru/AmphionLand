@@ -6,12 +6,12 @@ components:
     state:
       rows: 1
       cols: 2
-  - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
-    state:
-      fillColor: "#696969"
-      strokeColor: "#000"
-      strokeWeight: 0
-      pType: 3
+#  - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
+#    state:
+#      fillColor: "#696969"
+#      strokeColor: "#000"
+#      strokeWeight: 0
+#      pType: 3
 id: 0
 name: Editor
 transform:
