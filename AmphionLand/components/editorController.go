@@ -5,6 +5,7 @@ import (
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
+	"strings"
 )
 
 type EditorController struct {
@@ -14,7 +15,7 @@ type EditorController struct {
 func (s *EditorController) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
-	sceneObject1 := engine.NewSceneObject("bruh1")
+	sceneObject1 := engine.NewSceneObject("left_scene")
 	sceneObject1.Transform.Position.Z = 1
 	sceneObject1.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
 	view := builtin.NewShapeView(builtin.ShapeRectangle)
@@ -22,7 +23,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	view.StrokeWeight = 0
 	sceneObject1.AddComponent(view)
 
-	sceneObject2 := engine.NewSceneObject("bruh2")
+	sceneObject2 := engine.NewSceneObject("right_thing")
 	sceneObject2.Transform.Position.Z = 1
 	sceneObject2.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
 	layout := builtin.NewGridLayout()
@@ -52,16 +53,19 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		sceneObject2.AddChild(prefab2)
 	}
 
-	sceneObject2_3 := engine.NewSceneObject("bruh3")
+	sceneObject2_3 := engine.NewSceneObject("Prefab List")
 	sceneObject2_3.Transform.Position.Z = 1
 	sceneObject2_3.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
 	view4 := builtin.NewShapeView(builtin.ShapeRectangle)
 	view4.FillColor = a.NewColor(115, 115, 180)
 	view4.StrokeWeight = 1
 	sceneObject2_3.AddComponent(view4)
+	prefabs_layout := builtin.NewGridLayout()
+	sceneObject2_3.AddComponent(prefabs_layout)
 	sceneObject2.AddChild(sceneObject2_3)
+	s.SpawnPrefabsList(sceneObject2_3)
 
-	sceneObject2_4 := engine.NewSceneObject("bruh4")
+	sceneObject2_4 := engine.NewSceneObject("Hierarchy")
 	sceneObject2_3.Transform.Position.Z = 1
 	sceneObject2_4.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
 	view5 := builtin.NewShapeView(builtin.ShapeRectangle)
@@ -80,4 +84,30 @@ func (s *EditorController) OnStart() {
 
 func (s *EditorController) GetName() string {
 	return engine.NameOfComponent(s)
+}
+
+func (s *EditorController) SpawnPrefabsList(sceneO *engine.SceneObject) {
+	file, err := s.Engine.GetResourceManager().ReadFile(res.Strings_prefabsList)
+	if err!=nil {
+		engine.LogDebug("Failed to read file")
+		engine.LogError(err.Error())
+		return
+	}
+	fileStr := string(file)
+	engine.LogDebug(fileStr)
+	fileStrList := strings.Split(fileStr, "\r\n")
+	engine.LogDebug("%+v", fileStrList)
+	for _, prefabName := range fileStrList {
+		path := "prefabs/" + prefabName + ".yaml"
+		prefab, err := engine.LoadPrefab(res.Prefabs_prefabViewer)
+		if err!=nil {
+			engine.LogError(err.Error())
+			return
+		}
+		prefabViewerController := prefab.GetComponentByName(".+PrefabViewerController").(*PrefabViewerController)
+		prefabViewerController.PrefabPath = path
+		prefabViewerController.SetTextView(prefabName)
+
+		sceneO.AddChild(prefab)
+	}
 }
