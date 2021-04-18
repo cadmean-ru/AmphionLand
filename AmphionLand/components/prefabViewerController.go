@@ -1,8 +1,6 @@
 package components
 
 import (
-	"AmphionLand/generated/res"
-	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 )
@@ -16,37 +14,37 @@ type PrefabViewerController struct {
 
 func (s *PrefabViewerController) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
+}
 
-	if s.flag {
-		s.SetTextView(s.Text)
-	}
-
-	s.SceneObject.GetChildByName("Text").GetComponentByName("github.com/cadmean-ru/amphion/engine/builtin.TextView").(*builtin.TextView).SetHTextAlign(a.TextAlignCenter)
-	s.SceneObject.GetChildByName("Text").GetComponentByName("github.com/cadmean-ru/amphion/engine/builtin.TextView").(*builtin.TextView).SetVTextAlign(a.TextAlignCenter)
-	s.SceneObject.GetChildByName("Text").GetComponentByName("github.com/cadmean-ru/amphion/engine/builtin.TextView").(*builtin.TextView).SetFontSize(69)
+func (s *PrefabViewerController) OnStart() {
+	textObj := s.SceneObject.GetChildByName("Text")
+	textObj.GetComponentByName("TextView", true).(*builtin.TextView).SetText(s.Text)
+	engine.LogDebug("%+v", s.SceneObject.Transform.GetGlobalRect())
+	engine.LogDebug("%+v", textObj.Transform.GetGlobalRect())
 }
 
 func (s *PrefabViewerController) GetName() string {
 	return engine.NameOfComponent(s)
 }
 
-func (s *PrefabViewerController) SetTextView(text string) {
-	s.Text = text
-	if s.SceneObject == nil {
-		s.flag = true
-		return
-	}
-	s.SceneObject.GetChildByName("Text").GetComponentByName("github.com/cadmean-ru/amphion/engine/builtin.TextView").(*builtin.TextView).SetText(text)
-}
-
 func OnClick(event engine.AmphionEvent) bool {
-	// path := event.Sender.(*engine.SceneObject).GetComponentByName("AmphionLand/components.PrefabViewerController").(*PrefabViewerController).PrefabPath
-	leftScene := engine.GetInstance().GetCurrentScene().GetChildByName("left_scene")
-	prefab, err := engine.LoadPrefab(res.Prefabs_button) //engine.GetInstance().GetResourceManager().IdOf(path))
-	if err != nil {
+	senderObj := event.Sender.(*engine.SceneObject)
+	path := senderObj.GetComponentByName("AmphionLand/components.PrefabViewerController").(*PrefabViewerController).PrefabPath
+
+	//prefab, err := engine.LoadPrefab(res.Prefabs_button) //engine.GetInstance().GetResourceManager().IdOf(path))
+	//if err != nil {
+	//	engine.LogError(err.Error())
+	//	return false
+	//}
+	//leftScene.AddChild(prefab)
+	engine.RunTask(engine.NewTaskBuilder().Run(func() (interface{}, error) {
+		return engine.LoadPrefab(engine.GetResourceManager().IdOf(path))
+	}).Then(func(res interface{}) {
+		leftScene := engine.GetCurrentScene().GetChildByName("left_scene")
+		leftScene.AddChild(res.(*engine.SceneObject))
+	}).Err(func(err error) {
 		engine.LogDebug(err.Error())
-		return false
-	}
-	leftScene.AddChild(prefab)
+	}).Build())
+
 	return true
 }

@@ -16,8 +16,8 @@ children:
         "y": 0
         z: 0
       size:
-        x: -2147483648
-        "y": -2147483648
+        x: $MatchParent
+        "y": $MatchParent
         z: 0
     components:
       - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
@@ -27,6 +27,8 @@ children:
           fontSize: 20
           fontWeight: 0
           text: "bruh"
+          hTextAlign: $TextAlignCenter
+          vTextAlign: $TextAlignCenter
 components:
   - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
     state:
@@ -60,5 +62,5 @@ transform:
     z: 0
   size:
     x: 50
-    "y": 100
+    "y": 30
     z: 0
