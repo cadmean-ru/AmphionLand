@@ -61,6 +61,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	view4.StrokeWeight = 1
 	sceneObject2_3.AddComponent(view4)
 	prefabs_layout := builtin.NewGridLayout()
+	prefabs_layout.RowPadding = 30
 	sceneObject2_3.AddComponent(prefabs_layout)
 	sceneObject2.AddChild(sceneObject2_3)
 	s.SpawnPrefabsList(sceneObject2_3)
@@ -94,9 +95,7 @@ func (s *EditorController) SpawnPrefabsList(sceneO *engine.SceneObject) {
 		return
 	}
 	fileStr := string(file)
-	engine.LogDebug(fileStr)
 	fileStrList := strings.Split(fileStr, "\r\n")
-	engine.LogDebug("%+v", fileStrList)
 	for _, prefabName := range fileStrList {
 		path := "prefabs/" + prefabName + ".yaml"
 		prefab, err := engine.LoadPrefab(res.Prefabs_prefabViewer)

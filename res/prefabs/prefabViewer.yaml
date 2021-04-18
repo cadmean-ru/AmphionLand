@@ -27,8 +27,6 @@ children:
           fontSize: 20
           fontWeight: 0
           text: "bruh"
-      - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
-        state: {}
 components:
   - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
     state:
@@ -39,6 +37,12 @@ components:
       cornerRadius: 69
   - name: AmphionLand/components.PrefabViewerController
     state: {}
+  - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
+    state: {}
+  - name: github.com/cadmean-ru/amphion/engine/builtin.EventListener
+    state:
+      eventCode: -4
+      handler: AmphionLand/components.OnClick
 id: 0
 name: Father of prefab
 transform:
@@ -55,6 +59,6 @@ transform:
     "y": 0
     z: 0
   size:
-    x: 100
-    "y": 200
+    x: 50
+    "y": 100
     z: 0
