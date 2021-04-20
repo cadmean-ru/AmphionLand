@@ -24,6 +24,9 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.WodgetController{})
 	cm.RegisterComponentType(&components.EmptyBox{})
 	cm.RegisterComponentType(&components.SearchAlgorithm{})
+	cm.RegisterComponentType(&components.EditorController{})
+	cm.RegisterComponentType(&components.PrefabViewerController{})
+	cm.RegisterEventHandler(components.OnClick)
 
 	rpc.Initialize("http://localhost:4200")
 }

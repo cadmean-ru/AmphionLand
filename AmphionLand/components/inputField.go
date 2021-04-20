@@ -20,7 +20,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 	s.SceneObject.AddComponent(builtin.NewBoundaryView())
 	
-	s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("github.com/cadmean-ru/amphion/engine/builtin.TextView").(*builtin.TextView)
+	s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("github.com/cadmean-ru/amphion/engine/builtin.TextView", true).(*builtin.TextView)
 
 	s.cursor = engine.NewSceneObject("BIG CURSOR")
 	s.cursor.Transform.Size = a.NewVector3(1, float32(s.textView.FontSize), 0)
