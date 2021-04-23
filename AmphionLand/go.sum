@@ -1,6 +1,6 @@
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/cadmean-ru/amphion v0.2.0-preview.2 h1:TphUdSKULPPhliiUz2KK1xe+jHTf7zel9YWybWurS+I=
-github.com/cadmean-ru/amphion v0.2.0-preview.2/go.mod h1:c3VRaHU+aier9hz/gBUzJb94NSEfF89Bp6aHlVL6mFA=
+github.com/cadmean-ru/amphion v0.2.0 h1:Xl6pbehKfLvVCctNOPJMpEEoKxHKlRib0ZmDx/gm5NA=
+github.com/cadmean-ru/amphion v0.2.0/go.mod h1:c3VRaHU+aier9hz/gBUzJb94NSEfF89Bp6aHlVL6mFA=
 github.com/cadmean-ru/goRPCKit v0.1.0/go.mod h1:uIUJQ4OmonM2uxQ0/jhA6KDdkfqvqAA0QhwSH6ngPRU=
 github.com/cadmean-ru/goRPCKit v0.1.1 h1:8pFhJEt+HPQfAqpTXAuuKtZZ1Q/bgIbbMIR1OIqW/bU=
 github.com/cadmean-ru/goRPCKit v0.1.1/go.mod h1:uIUJQ4OmonM2uxQ0/jhA6KDdkfqvqAA0QhwSH6ngPRU=
