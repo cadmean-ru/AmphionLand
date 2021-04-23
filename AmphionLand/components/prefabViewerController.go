@@ -35,6 +35,7 @@ func OnClick(event engine.AmphionEvent) bool {
 	//	return false
 	//}
 	//leftScene.AddChild(prefab)
+
 	engine.RunTask(engine.NewTaskBuilder().Run(func() (interface{}, error) {
 		return engine.LoadPrefab(engine.GetResourceManager().IdOf(path))
 	}).Then(func(res interface{}) {
@@ -43,6 +44,17 @@ func OnClick(event engine.AmphionEvent) bool {
 	}).Err(func(err error) {
 		engine.LogDebug(err.Error())
 	}).Build())
+
+	//engine.RunTask(engine.NewTaskBuilder().Run(func() (interface{}, error) {
+	//	engine.LogDebug(path)
+	//	id := engine.GetResourceManager().IdOf(path)
+	//	engine.LogDebug("Id %d", id)
+	//	return engine.GetResourceManager().ReadFile(id)
+	//}).Then(func(res interface{}) {
+	//	engine.LogDebug("%+v", string(res.([]byte)))
+	//}).Err(func(err error) {
+	//	engine.LogDebug(err.Error())
+	//}).Build())
 
 	return true
 }

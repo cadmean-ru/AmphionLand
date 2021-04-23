@@ -94,6 +94,7 @@ func (s *EditorController) SpawnPrefabsList(sceneO *engine.SceneObject) {
 		fileStr := string(file)
 		fileStrList := strings.Split(fileStr, "\n")
 		for _, prefabName := range fileStrList {
+			prefabName = strings.ReplaceAll(prefabName, "\r", "")
 			path := "prefabs/" + prefabName + ".yaml"
 			prefab, err := engine.LoadPrefab(res.Prefabs_prefabViewer)
 			if err!=nil {
