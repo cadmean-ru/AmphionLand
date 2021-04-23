@@ -19,8 +19,6 @@ func (s *PrefabViewerController) OnInit(ctx engine.InitContext) {
 func (s *PrefabViewerController) OnStart() {
 	textObj := s.SceneObject.GetChildByName("Text")
 	textObj.GetComponentByName("TextView", true).(*builtin.TextView).SetText(s.Text)
-	engine.LogDebug("%+v", s.SceneObject.Transform.GetGlobalRect())
-	engine.LogDebug("%+v", textObj.Transform.GetGlobalRect())
 }
 
 func (s *PrefabViewerController) GetName() string {
