@@ -15,20 +15,30 @@ type EditorController struct {
 func (s *EditorController) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
-	sceneObject1 := engine.NewSceneObject("left_scene")
-	sceneObject1.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
+	leftScene := engine.NewSceneObject("left_scene")
+	leftScene.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
 	view := builtin.NewShapeView(builtin.ShapeRectangle)
 	view.FillColor = a.NewColor(100, 100, 100)
 	view.StrokeWeight = 0
-	sceneObject1.AddComponent(view)
-	sceneObject1.AddComponent(builtin.NewGridLayout())
+	leftScene.AddComponent(view)
+	leftScene.AddComponent(builtin.NewGridLayout())
+	for i := 0; i < 10; i++ {
+		box := engine.NewSceneObject("emptyBox" + string(rune(i)))
+		rectangle := builtin.NewShapeView(builtin.ShapeRectangle)
+		rectangle.FillColor = a.TransparentColor()
+		rectangle.StrokeColor = a.BlackColor()
+		rectangle.StrokeWeight = 0
+		box.Transform.Size.Y = 100
+		box.AddComponent(rectangle)
+		leftScene.AddChild(box)
+	}
 
-	sceneObject2 := engine.NewSceneObject("right_thing")
-	sceneObject2.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
+	rightThing := engine.NewSceneObject("right_thing")
+	rightThing.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
 	layout := builtin.NewGridLayout()
 	layout.Cols = 2
 	layout.RowPadding = 20
-	sceneObject2.AddComponent(layout)
+	rightThing.AddComponent(layout)
 
 	prefab, err := engine.LoadPrefab(res.Prefabs_button)
 
@@ -38,7 +48,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		textView.SetText("Save Prefab")
 		textView.SetHTextAlign(a.TextAlignCenter)
 		textView.SetVTextAlign(a.TextAlignCenter)
-		sceneObject2.AddChild(prefab)
+		rightThing.AddChild(prefab)
 	}
 
 	prefab2, err2 := engine.LoadPrefab(res.Prefabs_button)
@@ -49,8 +59,39 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		textView.SetText("Save Scene")
 		textView.SetHTextAlign(a.TextAlignCenter)
 		textView.SetVTextAlign(a.TextAlignCenter)
-		sceneObject2.AddChild(prefab2)
+		rightThing.AddChild(prefab2)
 	}
+
+	gridViewer, gridErr := engine.LoadPrefab(res.Prefabs_button)
+
+	if gridErr==nil{
+		gridViewer.Transform.Size = a.NewVector3(a.MatchParent,50,4)
+		textView := gridViewer.FindComponentByName("TextView", true).(*builtin.TextView)
+		textView.SetText("Show Grid")
+		textView.SetHTextAlign(a.TextAlignCenter)
+		textView.SetVTextAlign(a.TextAlignCenter)
+
+		flag := false
+		gridViewer.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			strokeWeight := 0
+			if flag {
+				strokeWeight = 0
+				flag = !flag
+			} else {
+				strokeWeight = 1
+				flag = !flag
+			}
+			for _, box := range leftScene.GetChildren(){
+				box.GetComponentByName("ShapeView").(*builtin.ShapeView).StrokeWeight = byte(strokeWeight)
+			}
+			engine.GetInstance().ForceAllViewsRedraw()
+			engine.RequestRendering()
+			return true
+		}))
+		rightThing.AddChild(gridViewer)
+	}
+
+	rightThing.AddChild(engine.NewSceneObject("bruh"))
 
 	sceneObject2_3 := engine.NewSceneObject("Prefab List")
 	sceneObject2_3.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
@@ -61,7 +102,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	prefabs_layout := builtin.NewGridLayout()
 	prefabs_layout.RowPadding = 10
 	sceneObject2_3.AddComponent(prefabs_layout)
-	sceneObject2.AddChild(sceneObject2_3)
+	rightThing.AddChild(sceneObject2_3)
 
 	s.SpawnPrefabsList(sceneObject2_3)
 
@@ -71,10 +112,10 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	view5.FillColor = a.NewColor(115, 115, 180)
 	view5.StrokeWeight = 1
 	sceneObject2_4.AddComponent(view5)
-	sceneObject2.AddChild(sceneObject2_4)
+	rightThing.AddChild(sceneObject2_4)
 
-	s.SceneObject.AddChild(sceneObject1)
-	s.SceneObject.AddChild(sceneObject2)
+	s.SceneObject.AddChild(leftScene)
+	s.SceneObject.AddChild(rightThing)
 }
 
 func (s *EditorController) OnStart() {

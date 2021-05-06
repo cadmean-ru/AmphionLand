@@ -29,8 +29,6 @@ children:
           text: "bruh"
           hTextAlign: $TextAlignCenter
           vTextAlign: $TextAlignCenter
-      - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
-        state: {}
 components:
   - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
     state:
@@ -39,6 +37,8 @@ components:
       strokeWeight: 1
       pType: 3
       cornerRadius: 69
+  - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
+    state: {}
 id: 0
 name: Button
 transform:

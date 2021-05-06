@@ -1,6 +1,7 @@
 package components
 
 import (
+	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 )
@@ -40,7 +41,14 @@ func OnClick(event engine.AmphionEvent) bool {
 		return engine.LoadPrefab(engine.GetResourceManager().IdOf(path))
 	}).Then(func(res interface{}) {
 		leftScene := engine.GetCurrentScene().GetChildByName("left_scene")
-		leftScene.AddChild(res.(*engine.SceneObject))
+		for _, box := range leftScene.GetChildren() {
+			if len(box.GetChildren()) == 0 {
+				pref :=res.(*engine.SceneObject)
+				box.AddChild(pref)
+				pref.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,a.MatchParent)
+				break
+			}
+		}
 	}).Err(func(err error) {
 		engine.LogDebug(err.Error())
 	}).Build())
