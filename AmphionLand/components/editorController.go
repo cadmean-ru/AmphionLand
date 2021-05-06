@@ -106,13 +106,14 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 
 	s.SpawnPrefabsList(sceneObject2_3)
 
-	sceneObject2_4 := engine.NewSceneObject("Hierarchy")
-	sceneObject2_4.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
+	hierarchy := engine.NewSceneObject("Hierarchy")
+	hierarchy.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
 	view5 := builtin.NewShapeView(builtin.ShapeRectangle)
 	view5.FillColor = a.NewColor(115, 115, 180)
 	view5.StrokeWeight = 1
-	sceneObject2_4.AddComponent(view5)
-	rightThing.AddChild(sceneObject2_4)
+	hierarchy.AddComponent(view5)
+	hierarchy.AddComponent(builtin.NewGridLayout())
+	rightThing.AddChild(hierarchy)
 
 	s.SceneObject.AddChild(leftScene)
 	s.SceneObject.AddChild(rightThing)
