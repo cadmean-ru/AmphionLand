@@ -4,6 +4,7 @@ import (
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
+	"strconv"
 )
 
 type PrefabViewerController struct {
@@ -59,13 +60,19 @@ func OnClick(event engine.AmphionEvent) bool {
 		hierarchy.RemoveChild(child)
 	})
 
-	transMap := make(map[int]a.Vector3)
-	transMap[0] = currentPrefab.Transform.Position
-	transMap[1] = currentPrefab.Transform.Rotation
-	transMap[2] = currentPrefab.Transform.Size
+	transMap := [3]a.Vector3{currentPrefab.Transform.Position, currentPrefab.Transform.Rotation, currentPrefab.Transform.Size}
+
+	transform := [3]string{"Position", "Rotation", "Size"}
 
 	for i := 0; i < 3; i++ {
-		engine.LogDebug("loop")
+		nameBox := engine.NewSceneObject("nameBox" + string(rune(i)))
+		nameBox.Transform.Size.Y = 30
+		nameBoxText := builtin.NewTextView(transform[i])
+		nameBoxText.SetVTextAlign(a.TextAlignCenter)
+		nameBoxText.SetHTextAlign(a.TextAlignCenter)
+		nameBox.AddComponent(nameBoxText)
+		hierarchy.AddChild(nameBox)
+
 		box := engine.NewSceneObject("emptyBox" + string(rune(i)))
 		box.Transform.Size.Y = 90
 		grid := builtin.NewGridLayout()
@@ -73,15 +80,8 @@ func OnClick(event engine.AmphionEvent) bool {
 		grid.Rows = 3
 		box.AddComponent(grid)
 
-		nameMap := make(map[int]string)
-		nameMap[0] = "X"
-		nameMap[1] = "Y"
-		nameMap[2] = "Z"
-
-		valueMap := make(map[int] float32)
-		valueMap[0] = transMap[i].X
-		valueMap[1] = transMap[i].Y
-		valueMap[2] = transMap[i].Z
+		nameMap := [3]string{"X", "Y", "Z"}
+		valueMap := [3]float32{transMap[i].X, transMap[i].Y, transMap[i].Z}
 
 		for j := 0; j < 3; j++{
 			name := engine.NewSceneObject("name" + string(rune(i)) + string(rune(j)))
@@ -91,16 +91,15 @@ func OnClick(event engine.AmphionEvent) bool {
 
 			name.AddComponent(nameText)
 			name.Transform.Size.Y = 30
-			name.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
 
 			value := engine.NewSceneObject("value" + string(rune(i)) + string(rune(j)))
-			valueText := builtin.NewTextView(string(int32(valueMap[j])))
+			valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f',3,32))
 			valueText.SetVTextAlign(a.TextAlignCenter)
 			valueText.SetHTextAlign(a.TextAlignCenter)
 
 			value.AddComponent(valueText)
 			value.Transform.Size.Y = 30
-			value.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
+			//value.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
 
 			box.AddChild(name)
 			box.AddChild(value)
