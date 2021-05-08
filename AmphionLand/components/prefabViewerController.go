@@ -20,12 +20,31 @@ func (s *PrefabViewerController) OnInit(ctx engine.InitContext) {
 
 func (s *PrefabViewerController) OnStart() {
 	textObj := s.SceneObject.GetChildByName("Text")
-	textObj.GetComponentByName("TextView", true).(*builtin.TextView).SetText(s.Text)
+	textObj.GetComponentByName("TextView").(*builtin.TextView).SetText(s.Text)
 }
 
 func (s *PrefabViewerController) GetName() string {
 	return engine.NameOfComponent(s)
 }
+
+//func Yeet(event engine.AmphionEvent) bool {
+//	senderObj := event.Sender.(*engine.SceneObject)
+//	path := senderObj.GetComponentByName("AmphionLand/components.PrefabViewerController").(*PrefabViewerController).PrefabPath
+//	engine.LogDebug("Here 2")
+//
+//	engine.RunTask(engine.NewTaskBuilder().Run(func() (interface{}, error) {
+//		return engine.LoadPrefab(engine.GetResourceManager().IdOf(path))
+//	}).Then(func(res interface{}) {
+//		pref :=res.(*engine.SceneObject)
+//		pref.AddComponent(&Yeeter{})
+//		engine.GetCurrentScene().AddChild(pref)
+//		engine.LogDebug("Here")
+//	}).Err(func(err error) {
+//		engine.LogDebug(err.Error())
+//	}).Build())
+//
+//	return true
+//}
 
 func OnClick(event engine.AmphionEvent) bool {
 	senderObj := event.Sender.(*engine.SceneObject)
@@ -41,21 +60,26 @@ func OnClick(event engine.AmphionEvent) bool {
 	engine.RunTask(engine.NewTaskBuilder().Run(func() (interface{}, error) {
 		return engine.LoadPrefab(engine.GetResourceManager().IdOf(path))
 	}).Then(func(res interface{}) {
-		leftScene := engine.GetCurrentScene().GetChildByName("left_scene")
-		for _, box := range leftScene.GetChildren() {
-			if len(box.GetChildren()) == 0 {
-				pref :=res.(*engine.SceneObject)
-				currentPrefab = pref
-				box.AddChild(pref)
-				pref.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,a.MatchParent)
-				break
-			}
-		}
+		//leftScene := engine.GetCurrentScene().GetChildByName("left_scene")
+		//for _, box := range leftScene.GetChildren() {
+		//	if len(box.GetChildren()) == 0 {
+		//		pref :=res.(*engine.SceneObject)
+		//		currentPrefab = pref
+		//		box.AddChild(pref)
+		//		pref.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,a.MatchParent)
+		//		break
+		//	}
+		//}
+
+		pref :=res.(*engine.SceneObject)
+		pref.AddComponent(&Yeeter{})
+		engine.GetCurrentScene().AddChild(pref)
+		engine.LogDebug("Here")
 	}).Err(func(err error) {
 		engine.LogDebug(err.Error())
 	}).Build())
 
-	hierarchy := engine.GetCurrentScene().GetChildByName("right_thing").GetChildByName("Hierarchy")
+	hierarchy := engine.FindObjectByName("Hierarchy")
 	hierarchy.ForEachChild(func(child *engine.SceneObject) {
 		hierarchy.RemoveChild(child)
 	})
