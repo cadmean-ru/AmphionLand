@@ -49,7 +49,8 @@ func (s *PrefabViewerController) GetName() string {
 func OnClick(event engine.AmphionEvent) bool {
 	senderObj := event.Sender.(*engine.SceneObject)
 	path := senderObj.GetComponentByName("AmphionLand/components.PrefabViewerController").(*PrefabViewerController).PrefabPath
-	currentPrefab := engine.NewSceneObject("temp")
+	//currentPrefab := engine.NewSceneObject("temp")
+	pref := engine.NewSceneObject("temp")
 
 	prefId := engine.GetResourceManager().IdOf(path)
 
@@ -67,7 +68,8 @@ func OnClick(event engine.AmphionEvent) bool {
 		//	}
 		//}
 
-		pref := res.(*engine.SceneObject)
+		pref = res.(*engine.SceneObject)
+		engine.LogDebug("name " + pref.GetName())
 
 		pref.ForEachObject(func(object *engine.SceneObject) {
 			for _, c := range object.GetComponents(true) {
@@ -91,62 +93,72 @@ func OnClick(event engine.AmphionEvent) bool {
 		engine.GetCurrentScene().AddChild(pref)
 		engine.LogDebug("Here")
 
+		hierarchy := engine.FindObjectByName("Hierarchy")
+		hierarchy.ForEachChild(func(child *engine.SceneObject) {
+			hierarchy.RemoveChild(child)
+		})
+
+		prefNameBox := engine.NewSceneObject("prefNameBox")
+		prefNameBox.Transform.Size.Y = 30
+		prefNameBoxText := builtin.NewTextView(pref.GetName())
+		prefNameBoxText.SetVTextAlign(a.TextAlignCenter)
+		prefNameBoxText.SetHTextAlign(a.TextAlignCenter)
+		prefNameBox.AddComponent(prefNameBoxText)
+		hierarchy.AddChild(prefNameBox)
+
+		transMap := [3]a.Vector3{pref.Transform.Position, pref.Transform.Rotation, pref.Transform.Size}
+
+		transform := [3]string{"Position", "Rotation", "Size"}
+
+		for i := 0; i < 3; i++ {
+			nameBox := engine.NewSceneObject("nameBox" + string(rune(i)))
+			nameBox.Transform.Size.Y = 30
+			nameBoxText := builtin.NewTextView(transform[i])
+			nameBoxText.SetVTextAlign(a.TextAlignCenter)
+			nameBoxText.SetHTextAlign(a.TextAlignCenter)
+			nameBox.AddComponent(nameBoxText)
+			hierarchy.AddChild(nameBox)
+
+			box := engine.NewSceneObject("emptyBox" + string(rune(i)))
+			box.Transform.Size.Y = 90
+			grid := builtin.NewGridLayout()
+			grid.Cols = 2
+			grid.Rows = 3
+			box.AddComponent(grid)
+
+			nameMap := [3]string{"X", "Y", "Z"}
+			valueMap := [3]float32{transMap[i].X, transMap[i].Y, transMap[i].Z}
+
+			for j := 0; j < 3; j++{
+				name := engine.NewSceneObject("name" + string(rune(i)) + string(rune(j)))
+				nameText := builtin.NewTextView(nameMap[j])
+				nameText.SetVTextAlign(a.TextAlignCenter)
+				nameText.SetHTextAlign(a.TextAlignCenter)
+
+				name.AddComponent(nameText)
+				name.Transform.Size.Y = 30
+
+				value := engine.NewSceneObject("value" + string(rune(i)) + string(rune(j)))
+				valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f',3,32))
+				valueText.SetVTextAlign(a.TextAlignCenter)
+				valueText.SetHTextAlign(a.TextAlignCenter)
+
+				value.AddComponent(valueText)
+				value.Transform.Size.Y = 30
+				//value.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
+
+				box.AddChild(name)
+				box.AddChild(value)
+			}
+
+			hierarchy.AddChild(box)
+		}
+
 	}).Err(func(err error) {
 		engine.LogDebug(err.Error())
 	}).Build())
 
-	hierarchy := engine.FindObjectByName("Hierarchy")
-	hierarchy.ForEachChild(func(child *engine.SceneObject) {
-		hierarchy.RemoveChild(child)
-	})
 
-	transMap := [3]a.Vector3{currentPrefab.Transform.Position, currentPrefab.Transform.Rotation, currentPrefab.Transform.Size}
-
-	transform := [3]string{"Position", "Rotation", "Size"}
-
-	for i := 0; i < 3; i++ {
-		nameBox := engine.NewSceneObject("nameBox" + string(rune(i)))
-		nameBox.Transform.Size.Y = 30
-		nameBoxText := builtin.NewTextView(transform[i])
-		nameBoxText.SetVTextAlign(a.TextAlignCenter)
-		nameBoxText.SetHTextAlign(a.TextAlignCenter)
-		nameBox.AddComponent(nameBoxText)
-		hierarchy.AddChild(nameBox)
-
-		box := engine.NewSceneObject("emptyBox" + string(rune(i)))
-		box.Transform.Size.Y = 90
-		grid := builtin.NewGridLayout()
-		grid.Cols = 2
-		grid.Rows = 3
-		box.AddComponent(grid)
-
-		nameMap := [3]string{"X", "Y", "Z"}
-		valueMap := [3]float32{transMap[i].X, transMap[i].Y, transMap[i].Z}
-
-		for j := 0; j < 3; j++{
-			name := engine.NewSceneObject("name" + string(rune(i)) + string(rune(j)))
-			nameText := builtin.NewTextView(nameMap[j])
-			nameText.SetVTextAlign(a.TextAlignCenter)
-			nameText.SetHTextAlign(a.TextAlignCenter)
-
-			name.AddComponent(nameText)
-			name.Transform.Size.Y = 30
-
-			value := engine.NewSceneObject("value" + string(rune(i)) + string(rune(j)))
-			valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f',3,32))
-			valueText.SetVTextAlign(a.TextAlignCenter)
-			valueText.SetHTextAlign(a.TextAlignCenter)
-
-			value.AddComponent(valueText)
-			value.Transform.Size.Y = 30
-			//value.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
-
-			box.AddChild(name)
-			box.AddChild(value)
-		}
-
-		hierarchy.AddChild(box)
-	}
 
 	return true
 }
