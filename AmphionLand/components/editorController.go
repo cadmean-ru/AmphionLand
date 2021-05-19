@@ -2,15 +2,19 @@ package components
 
 import (
 	"AmphionLand/generated/res"
+	owm "github.com/briandowns/openweathermap"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
+	"strconv"
 	"strings"
 )
 
 type EditorController struct {
 	engine.ComponentImpl
 	yeetingSceneObject *engine.SceneObject
+	hierarchy *engine.SceneObject
+	remover bool
 }
 
 func (s *EditorController) OnInit(ctx engine.InitContext) {
@@ -37,6 +41,12 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 			engine.LogDebug("ldskjfklsj")
 
 			if s.yeetingSceneObject == nil {
+				if s.remover {
+					box.RemoveAllChildren()
+					s.hierarchy.RemoveAllChildren()
+				} else {
+
+				}
 				return false
 			}
 
@@ -113,7 +123,31 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		rightThing.AddChild(gridViewer)
 	}
 
-	rightThing.AddChild(engine.NewSceneObject("bruh"))
+	prefabRemove, prefabRemoveErr := engine.LoadPrefab(res.Prefabs_button)
+
+	if prefabRemoveErr==nil{
+		prefabRemove.Transform.Size = a.NewVector3(a.MatchParent,50,4)
+		textView := prefabRemove.FindComponentByName("TextView", true).(*builtin.TextView)
+		textView.SetText("Remove Prefab")
+		textView.SetHTextAlign(a.TextAlignCenter)
+		textView.SetVTextAlign(a.TextAlignCenter)
+
+		prefabRemoveShapeView := prefabRemove.GetComponentByName("ShapeView", true).(*builtin.ShapeView)
+		prefabRemoveShapeViewColor := prefabRemoveShapeView.FillColor
+		s.remover = false
+		prefabRemove.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			if s.remover {
+				prefabRemoveShapeView.FillColor = prefabRemoveShapeViewColor
+			} else {
+				prefabRemoveShapeView.FillColor = a.NewColor(50,50,50)
+			}
+			s.remover = !s.remover
+			prefabRemoveShapeView.ForceRedraw()
+			engine.RequestRendering()
+			return true
+		}))
+		rightThing.AddChild(prefabRemove)
+	}
 
 	sceneObject2_3 := engine.NewSceneObject("Prefab List")
 	sceneObject2_3.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
@@ -128,21 +162,38 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 
 	s.SpawnPrefabsList(sceneObject2_3)
 
-	hierarchy := engine.NewSceneObject("Hierarchy")
-	hierarchy.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
+	s.hierarchy = engine.NewSceneObject("Hierarchy")
+	s.hierarchy.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
 	view5 := builtin.NewShapeView(builtin.ShapeRectangle)
 	view5.FillColor = a.NewColor(115, 115, 180)
 	view5.StrokeWeight = 1
-	hierarchy.AddComponent(view5)
-	hierarchy.AddComponent(builtin.NewGridLayout())
-	rightThing.AddChild(hierarchy)
+	s.hierarchy.AddComponent(view5)
+	s.hierarchy.AddComponent(builtin.NewGridLayout())
+	rightThing.AddChild(s.hierarchy)
 
 	s.SceneObject.AddChild(leftScene)
 	s.SceneObject.AddChild(rightThing)
 }
 
 func (s *EditorController) OnStart() {
-
+	apiKey, err := s.Engine.GetResourceManager().ReadFile(res.Strings_definetlynotkey)
+	if err==nil {
+		w, apiErr := owm.NewCurrent("C", "ru", string(apiKey))
+		if apiErr == nil {
+			_ = w.CurrentByName("Moscow")
+			engine.LogDebug(strconv.FormatFloat(w.Main.Temp, 'f',3,32))
+			engine.LogDebug(strconv.FormatFloat(w.Main.FeelsLike, 'f',3,32))
+			//engine.LogDebug(strconv.FormatFloat(w.Main.GrndLevel, 'f',3,32))
+			engine.LogDebug(strconv.FormatFloat(w.Main.TempMax, 'f',3,32))
+			engine.LogDebug(strconv.FormatFloat(w.Main.TempMin, 'f',3,32))
+			//engine.LogDebug(string(rune(w.Main.Humidity)))
+			engine.LogDebug(w.Weather[0].Description)
+		} else {
+			engine.LogDebug(apiErr.Error())
+		}
+	} else {
+		engine.LogDebug(err.Error())
+	}
 }
 
 func (s *EditorController) GetName() string {
