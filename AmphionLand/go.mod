@@ -8,4 +8,4 @@ require (
 	github.com/cadmean-ru/goRPCKit v0.1.1 // indirect
 )
 
-//replace github.com/cadmean-ru/amphion v0.2.0 => ../../AmphionEngine/amphion
+replace github.com/cadmean-ru/amphion v0.2.1 => ../../AmphionEngine/amphion

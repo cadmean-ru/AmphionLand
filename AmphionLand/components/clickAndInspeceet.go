@@ -10,11 +10,16 @@ import (
 
 type ClickAndInspeceet struct {
 	engine.ComponentImpl
+	editor *EditorController
+	hierarchy *engine.SceneObject
 }
 
 func (s *ClickAndInspeceet) OnStart() {
 	engine.LogDebug("inspeceet start")
 	engine.BindEventHandler(engine.EventMouseDown, s.handleClick)
+
+	s.editor = engine.FindComponentByName("EditorController").(*EditorController)
+	s.hierarchy = engine.FindObjectByName("Hierarchy")
 }
 
 func (s *ClickAndInspeceet) OnStop() {
@@ -25,14 +30,66 @@ func (s *ClickAndInspeceet) GetName() string {
 	return engine.NameOfComponent(s)
 }
 
+func (s *ClickAndInspeceet) LayoutChildren() {
+	children := s.SceneObject.GetChildren()
+	if len(children) == 0 {
+		return
+	}
+
+	first := children[0]
+	first.Transform.Position = a.NewVector3(0, 0, 1)
+	first.Transform.Pivot = a.ZeroVector()
+	first.Transform.Size = a.NewVector3(a.MatchParent, a.MatchParent, a.MatchParent)
+
+	for i := 1; i < len(children); i++ {
+		c := children[i]
+		c.Transform.Position = a.ZeroVector()
+		c.Transform.Size = a.ZeroVector()
+	}
+}
+
 func (s *ClickAndInspeceet) handleClick(event engine.AmphionEvent) bool {
-	s.showInspectorForObject(event.Data.(engine.MouseEventData).SceneObject)
+	if event.Data.(engine.MouseEventData).SceneObject != s.SceneObject {
+		return true
+	}
+
+	engine.LogDebug("bruh 1")
+
+	if s.editor.yeetingSceneObject == nil {
+		if s.editor.remover {
+			s.SceneObject.RemoveAllChildren()
+			s.editor.hierarchy.RemoveAllChildren()
+		} else if s.SceneObject.GetChildrenCount() == 1 {
+			s.showInspector(s.SceneObject)
+		} else {
+			s.editor.hierarchy.RemoveAllChildren()
+		}
+
+		engine.RequestRendering()
+		return false
+	}
+
+	engine.LogDebug("bruh 2")
+
+	s.SceneObject.RemoveAllChildren()
+
+	newObj := s.editor.yeetingSceneObject
+	newObj.RemoveComponentByName("Yeeter")
+	newObj.SetParent(s.SceneObject)
+	s.editor.yeetingSceneObject = nil
+
+	engine.LogDebug("here 1lekj")
+
+	s.showInspector(s.SceneObject)
+
+	engine.RequestRendering()
 	return false
 }
 
-func (s *ClickAndInspeceet) showInspectorForObject(object *engine.SceneObject) {
-	hierarchy := engine.FindObjectByName("Hierarchy")
-	hierarchy.RemoveAllChildren()
+func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
+	object = object.GetChildren()[0]
+
+	s.hierarchy.RemoveAllChildren()
 
 	objectNameBox := engine.NewSceneObject("objectNameBox")
 	objectNameBox.Transform.Size.Y = 30
@@ -40,62 +97,62 @@ func (s *ClickAndInspeceet) showInspectorForObject(object *engine.SceneObject) {
 	objectNameBoxText.SetVTextAlign(a.TextAlignCenter)
 	objectNameBoxText.SetHTextAlign(a.TextAlignCenter)
 	objectNameBox.AddComponent(objectNameBoxText)
-	hierarchy.AddChild(objectNameBox)
+	s.hierarchy.AddChild(objectNameBox)
 
-	transMap := map[string]a.Vector3 {
-		"Position": object.Transform.Position,
-		"Rotation": object.Transform.Rotation,
-		"Size":     object.Transform.Size,
-	}
+	//transMap := map[string]a.Vector3 {
+	//	"Position": object.Transform.Position,
+	//	"Rotation": object.Transform.Rotation,
+	//	"Size":     object.Transform.Size,
+	//}
+	//
+	//i := 0
+	//for vecName, vec := range transMap {
+	//	nameBox := engine.NewSceneObject("nameBox" + string(rune(i)))
+	//	nameBox.Transform.Size.Y = 30
+	//	nameBoxText := builtin.NewTextView(vecName)
+	//	nameBoxText.SetVTextAlign(a.TextAlignCenter)
+	//	nameBoxText.SetHTextAlign(a.TextAlignCenter)
+	//	nameBox.AddComponent(nameBoxText)
+	//	s.hierarchy.AddChild(nameBox)
+	//
+	//	box := engine.NewSceneObject("emptyBox" + string(rune(i)))
+	//	box.Transform.Size.Y = 90
+	//	grid := builtin.NewGridLayout()
+	//	grid.Cols = 2
+	//	grid.Rows = 3
+	//
+	//	box.AddComponent(grid)
+	//
+	//	nameMap := [3]string{"X", "Y", "Z"}
+	//	valueMap := [3]float32{vec.X, vec.Y, vec.Z}
+	//
+	//	for j := 0; j < 3; j++{
+	//		name := engine.NewSceneObject("name" + string(rune(i)) + string(rune(j)))
+	//		nameText := builtin.NewTextView(nameMap[j])
+	//		nameText.SetVTextAlign(a.TextAlignCenter)
+	//		nameText.SetHTextAlign(a.TextAlignCenter)
+	//
+	//		name.AddComponent(nameText)
+	//		name.Transform.Size.Y = 30
+	//
+	//		value := engine.NewSceneObject("value" + string(rune(i)) + string(rune(j)))
+	//		valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f',3,32))
+	//		valueText.SetVTextAlign(a.TextAlignCenter)
+	//		valueText.SetHTextAlign(a.TextAlignCenter)
+	//
+	//		value.AddComponent(valueText)
+	//		value.Transform.Size.Y = 30
+	//		//value.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
+	//
+	//		box.AddChild(name)
+	//		box.AddChild(value)
+	//	}
+	//	s.hierarchy.AddChild(box)
+	//
+	//	i++
+	//}
 
-	i := 0
-	for vecName, vec := range transMap {
-		nameBox := engine.NewSceneObject("nameBox" + string(rune(i)))
-		nameBox.Transform.Size.Y = 30
-		nameBoxText := builtin.NewTextView(vecName)
-		nameBoxText.SetVTextAlign(a.TextAlignCenter)
-		nameBoxText.SetHTextAlign(a.TextAlignCenter)
-		nameBox.AddComponent(nameBoxText)
-		hierarchy.AddChild(nameBox)
-
-		box := engine.NewSceneObject("emptyBox" + string(rune(i)))
-		box.Transform.Size.Y = 90
-		grid := builtin.NewGridLayout()
-		grid.Cols = 2
-		grid.Rows = 3
-
-		box.AddComponent(grid)
-
-		nameMap := [3]string{"X", "Y", "Z"}
-		valueMap := [3]float32{vec.X, vec.Y, vec.Z}
-
-		for j := 0; j < 3; j++{
-			name := engine.NewSceneObject("name" + string(rune(i)) + string(rune(j)))
-			nameText := builtin.NewTextView(nameMap[j])
-			nameText.SetVTextAlign(a.TextAlignCenter)
-			nameText.SetHTextAlign(a.TextAlignCenter)
-
-			name.AddComponent(nameText)
-			name.Transform.Size.Y = 30
-
-			value := engine.NewSceneObject("value" + string(rune(i)) + string(rune(j)))
-			valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f',3,32))
-			valueText.SetVTextAlign(a.TextAlignCenter)
-			valueText.SetHTextAlign(a.TextAlignCenter)
-
-			value.AddComponent(valueText)
-			value.Transform.Size.Y = 30
-			//value.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
-
-			box.AddChild(name)
-			box.AddChild(value)
-		}
-		hierarchy.AddChild(box)
-
-		i++
-	}
-
-	if object.GetName()=="horizontalYeeter"{
+	if object.GetName() == "Horizontal grid" {
 		gridObject := engine.NewSceneObject("grid bruh")
 		colsAmount := object.GetComponentByName("GridLayout").(*builtin.GridLayout).Rows
 
@@ -122,6 +179,6 @@ func (s *ClickAndInspeceet) showInspectorForObject(object *engine.SceneObject) {
 		gridObject.AddChild(inputObj)
 		gridObject.AddChild(buttonObj)
 
-		hierarchy.AddChild(gridObject)
+		s.hierarchy.AddChild(gridObject)
 	}
 }

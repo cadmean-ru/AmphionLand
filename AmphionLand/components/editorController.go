@@ -35,32 +35,8 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		rectangle.StrokeWeight = 0
 		box.Transform.Size.Y = 100
 		box.AddComponent(rectangle)
-		box.AddComponent(&EmptyBox{})
 		box.AddComponent(builtin.NewRectBoundary())
-		box.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-			engine.LogDebug("ldskjfklsj")
-
-			if s.yeetingSceneObject == nil {
-				if s.remover {
-					box.RemoveAllChildren()
-					s.hierarchy.RemoveAllChildren()
-				} else {
-
-				}
-				return false
-			}
-
-			engine.LogDebug("ldskjfklsj")
-
-			box.RemoveAllChildren()
-
-			s.yeetingSceneObject.RemoveComponentByName("Yeeter")
-			s.yeetingSceneObject.AddComponent(&ClickAndInspeceet{})
-			s.yeetingSceneObject.SetParent(box)
-			s.yeetingSceneObject = nil
-			engine.LogDebug("here 1lekj")
-			return false
-		}))
+		box.AddComponent(&ClickAndInspeceet{})
 		leftScene.AddChild(box)
 	}
 
