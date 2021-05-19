@@ -10,25 +10,55 @@ import (
 
 type EditorController struct {
 	engine.ComponentImpl
+	yeetingSceneObject *engine.SceneObject
 }
 
 func (s *EditorController) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
-	sceneObject1 := engine.NewSceneObject("left_scene")
-	sceneObject1.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
+	leftScene := engine.NewSceneObject("left_scene")
+	leftScene.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
 	view := builtin.NewShapeView(builtin.ShapeRectangle)
 	view.FillColor = a.NewColor(100, 100, 100)
 	view.StrokeWeight = 0
-	sceneObject1.AddComponent(view)
-	sceneObject1.AddComponent(builtin.NewGridLayout())
+	leftScene.AddComponent(view)
+	leftScene.AddComponent(builtin.NewGridLayout())
+	for i := 0; i < 10; i++ {
+		box := engine.NewSceneObject("emptyBox" + string(rune(i)))
+		rectangle := builtin.NewShapeView(builtin.ShapeRectangle)
+		rectangle.FillColor = a.TransparentColor()
+		rectangle.StrokeColor = a.BlackColor()
+		rectangle.StrokeWeight = 0
+		box.Transform.Size.Y = 100
+		box.AddComponent(rectangle)
+		box.AddComponent(&EmptyBox{})
+		box.AddComponent(builtin.NewRectBoundary())
+		box.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			engine.LogDebug("ldskjfklsj")
 
-	sceneObject2 := engine.NewSceneObject("right_thing")
-	sceneObject2.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
+			if s.yeetingSceneObject == nil {
+				return false
+			}
+
+			engine.LogDebug("ldskjfklsj")
+
+			box.RemoveAllChildren()
+
+			s.yeetingSceneObject.RemoveComponentByName("Yeeter")
+			s.yeetingSceneObject.SetParent(box)
+			s.yeetingSceneObject = nil
+			engine.LogDebug("here 1lekj")
+			return false
+		}))
+		leftScene.AddChild(box)
+	}
+
+	rightThing := engine.NewSceneObject("right_thing")
+	rightThing.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
 	layout := builtin.NewGridLayout()
 	layout.Cols = 2
 	layout.RowPadding = 20
-	sceneObject2.AddComponent(layout)
+	rightThing.AddComponent(layout)
 
 	prefab, err := engine.LoadPrefab(res.Prefabs_button)
 
@@ -38,7 +68,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		textView.SetText("Save Prefab")
 		textView.SetHTextAlign(a.TextAlignCenter)
 		textView.SetVTextAlign(a.TextAlignCenter)
-		sceneObject2.AddChild(prefab)
+		rightThing.AddChild(prefab)
 	}
 
 	prefab2, err2 := engine.LoadPrefab(res.Prefabs_button)
@@ -49,8 +79,40 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		textView.SetText("Save Scene")
 		textView.SetHTextAlign(a.TextAlignCenter)
 		textView.SetVTextAlign(a.TextAlignCenter)
-		sceneObject2.AddChild(prefab2)
+		rightThing.AddChild(prefab2)
 	}
+
+	gridViewer, gridErr := engine.LoadPrefab(res.Prefabs_button)
+
+	if gridErr==nil{
+		gridViewer.Transform.Size = a.NewVector3(a.MatchParent,50,4)
+		textView := gridViewer.FindComponentByName("TextView", true).(*builtin.TextView)
+		textView.SetText("Show Grid")
+		textView.SetHTextAlign(a.TextAlignCenter)
+		textView.SetVTextAlign(a.TextAlignCenter)
+
+		flag := false
+		gridViewer.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			strokeWeight := 0
+			if flag {
+				strokeWeight = 0
+				flag = !flag
+			} else {
+				strokeWeight = 1
+				flag = !flag
+			}
+			for _, box := range leftScene.GetChildren(){
+				rect := box.GetComponentByName("ShapeView").(*builtin.ShapeView)
+				rect.StrokeWeight = byte(strokeWeight)
+				rect.ForceRedraw()
+			}
+			engine.RequestRendering()
+			return true
+		}))
+		rightThing.AddChild(gridViewer)
+	}
+
+	rightThing.AddChild(engine.NewSceneObject("bruh"))
 
 	sceneObject2_3 := engine.NewSceneObject("Prefab List")
 	sceneObject2_3.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
@@ -61,20 +123,21 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	prefabs_layout := builtin.NewGridLayout()
 	prefabs_layout.RowPadding = 10
 	sceneObject2_3.AddComponent(prefabs_layout)
-	sceneObject2.AddChild(sceneObject2_3)
+	rightThing.AddChild(sceneObject2_3)
 
 	s.SpawnPrefabsList(sceneObject2_3)
 
-	sceneObject2_4 := engine.NewSceneObject("Hierarchy")
-	sceneObject2_4.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
+	hierarchy := engine.NewSceneObject("Hierarchy")
+	hierarchy.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
 	view5 := builtin.NewShapeView(builtin.ShapeRectangle)
 	view5.FillColor = a.NewColor(115, 115, 180)
 	view5.StrokeWeight = 1
-	sceneObject2_4.AddComponent(view5)
-	sceneObject2.AddChild(sceneObject2_4)
+	hierarchy.AddComponent(view5)
+	hierarchy.AddComponent(builtin.NewGridLayout())
+	rightThing.AddChild(hierarchy)
 
-	s.SceneObject.AddChild(sceneObject1)
-	s.SceneObject.AddChild(sceneObject2)
+	s.SceneObject.AddChild(leftScene)
+	s.SceneObject.AddChild(rightThing)
 }
 
 func (s *EditorController) OnStart() {
@@ -94,6 +157,7 @@ func (s *EditorController) SpawnPrefabsList(sceneO *engine.SceneObject) {
 		fileStr := string(file)
 		fileStrList := strings.Split(fileStr, "\n")
 		for _, prefabName := range fileStrList {
+			prefabName = strings.ReplaceAll(prefabName, "\r", "")
 			path := "prefabs/" + prefabName + ".yaml"
 			prefab, err := engine.LoadPrefab(res.Prefabs_prefabViewer)
 			if err!=nil {
