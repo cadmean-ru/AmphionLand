@@ -2,9 +2,11 @@ package components
 
 import (
 	"AmphionLand/generated/res"
+	owm "github.com/briandowns/openweathermap"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
+	"strconv"
 	"strings"
 )
 
@@ -173,7 +175,24 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 }
 
 func (s *EditorController) OnStart() {
-
+	apiKey, err := s.Engine.GetResourceManager().ReadFile(res.Strings_definetlynotkey)
+	if err==nil {
+		w, apiErr := owm.NewCurrent("C", "ru", string(apiKey))
+		if apiErr == nil {
+			_ = w.CurrentByName("Moscow")
+			engine.LogDebug(strconv.FormatFloat(w.Main.Temp, 'f',3,32))
+			engine.LogDebug(strconv.FormatFloat(w.Main.FeelsLike, 'f',3,32))
+			//engine.LogDebug(strconv.FormatFloat(w.Main.GrndLevel, 'f',3,32))
+			engine.LogDebug(strconv.FormatFloat(w.Main.TempMax, 'f',3,32))
+			engine.LogDebug(strconv.FormatFloat(w.Main.TempMin, 'f',3,32))
+			//engine.LogDebug(string(rune(w.Main.Humidity)))
+			engine.LogDebug(w.Weather[0].Description)
+		} else {
+			engine.LogDebug(apiErr.Error())
+		}
+	} else {
+		engine.LogDebug(err.Error())
+	}
 }
 
 func (s *EditorController) GetName() string {
