@@ -7,6 +7,7 @@ import (
 
 type Yeeter struct {
 	engine.ComponentImpl
+	prefId  a.ResId
 	prevPos a.IntVector2
 }
 
@@ -16,13 +17,16 @@ func (y *Yeeter) OnInit(ctx engine.InitContext) {
 }
 
 func (y *Yeeter) OnStart() {
+	editor := engine.FindComponentByName("EditorController").(*EditorController)
+	editor.yeetingSceneObject = y.SceneObject
+
 	engine.BindEventHandler(engine.EventMouseMove, y.handleMouseMove)
-	engine.BindEventHandler(engine.EventMouseDown, y.handleClick)
+	engine.BindEventHandler(engine.EventKeyDown, y.handleCancel)
 }
 
 func (y *Yeeter) OnStop() {
 	engine.UnbindEventHandler(engine.EventMouseMove, y.handleMouseMove)
-	engine.UnbindEventHandler(engine.EventMouseDown, y.handleClick)
+	engine.UnbindEventHandler(engine.EventKeyDown, y.handleCancel)
 }
 
 func (y *Yeeter) handleMouseMove(event engine.AmphionEvent) bool {
@@ -33,8 +37,13 @@ func (y *Yeeter) handleMouseMove(event engine.AmphionEvent) bool {
 	return true
 }
 
-func (y *Yeeter) handleClick(event engine.AmphionEvent) bool {
-	y.SceneObject.GetParent().RemoveChild(y.SceneObject)
+func (y *Yeeter) handleCancel(event engine.AmphionEvent) bool {
+	keyEvent := event.Data.(engine.KeyEvent)
+	if keyEvent.Key != "Escape" {
+		return true
+	}
+
+	y.SceneObject.RemoveFromScene()
 	return true
 }
 

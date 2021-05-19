@@ -50,15 +50,11 @@ func OnClick(event engine.AmphionEvent) bool {
 	senderObj := event.Sender.(*engine.SceneObject)
 	path := senderObj.GetComponentByName("AmphionLand/components.PrefabViewerController").(*PrefabViewerController).PrefabPath
 	currentPrefab := engine.NewSceneObject("temp")
-	//prefab, err := engine.LoadPrefab(res.Prefabs_button) //engine.GetInstance().GetResourceManager().IdOf(path))
-	//if err != nil {
-	//	engine.LogError(err.Error())
-	//	return false
-	//}
-	//leftScene.AddChild(prefab)
+
+	prefId := engine.GetResourceManager().IdOf(path)
 
 	engine.RunTask(engine.NewTaskBuilder().Run(func() (interface{}, error) {
-		return engine.LoadPrefab(engine.GetResourceManager().IdOf(path))
+		return engine.LoadPrefab(prefId)
 	}).Then(func(res interface{}) {
 		//leftScene := engine.GetCurrentScene().GetChildByName("left_scene")
 		//for _, box := range leftScene.GetChildren() {
@@ -71,10 +67,30 @@ func OnClick(event engine.AmphionEvent) bool {
 		//	}
 		//}
 
-		pref :=res.(*engine.SceneObject)
-		pref.AddComponent(&Yeeter{})
+		pref := res.(*engine.SceneObject)
+
+		pref.ForEachObject(func(object *engine.SceneObject) {
+			for _, c := range object.GetComponents(true) {
+				_, isView := c.(engine.ViewComponent)
+
+				if !isView {
+					engine.LogDebug("Removing component %v", c)
+					pref.RemoveComponent(c)
+				}
+			}
+		}, true)
+
+		pref.AddComponent(&Yeeter{
+			prefId: prefId,
+		})
+
+		for _, c := range pref.GetComponents(true) {
+			engine.LogDebug(c.GetName())
+		}
+
 		engine.GetCurrentScene().AddChild(pref)
 		engine.LogDebug("Here")
+
 	}).Err(func(err error) {
 		engine.LogDebug(err.Error())
 	}).Build())
@@ -131,17 +147,6 @@ func OnClick(event engine.AmphionEvent) bool {
 
 		hierarchy.AddChild(box)
 	}
-
-	//engine.RunTask(engine.NewTaskBuilder().Run(func() (interface{}, error) {
-	//	engine.LogDebug(path)
-	//	id := engine.GetResourceManager().IdOf(path)
-	//	engine.LogDebug("Id %d", id)
-	//	return engine.GetResourceManager().ReadFile(id)
-	//}).Then(func(res interface{}) {
-	//	engine.LogDebug("%+v", string(res.([]byte)))
-	//}).Err(func(err error) {
-	//	engine.LogDebug(err.Error())
-	//}).Build())
 
 	return true
 }

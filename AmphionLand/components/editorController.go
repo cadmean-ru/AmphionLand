@@ -10,6 +10,7 @@ import (
 
 type EditorController struct {
 	engine.ComponentImpl
+	yeetingSceneObject *engine.SceneObject
 }
 
 func (s *EditorController) OnInit(ctx engine.InitContext) {
@@ -30,6 +31,25 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		rectangle.StrokeWeight = 0
 		box.Transform.Size.Y = 100
 		box.AddComponent(rectangle)
+		box.AddComponent(&EmptyBox{})
+		box.AddComponent(builtin.NewRectBoundary())
+		box.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			engine.LogDebug("ldskjfklsj")
+
+			if s.yeetingSceneObject == nil {
+				return false
+			}
+
+			engine.LogDebug("ldskjfklsj")
+
+			box.RemoveAllChildren()
+
+			s.yeetingSceneObject.RemoveComponentByName("Yeeter")
+			s.yeetingSceneObject.SetParent(box)
+			s.yeetingSceneObject = nil
+			engine.LogDebug("here 1lekj")
+			return false
+		}))
 		leftScene.AddChild(box)
 	}
 
@@ -82,9 +102,10 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 				flag = !flag
 			}
 			for _, box := range leftScene.GetChildren(){
-				box.GetComponentByName("ShapeView").(*builtin.ShapeView).StrokeWeight = byte(strokeWeight)
+				rect := box.GetComponentByName("ShapeView").(*builtin.ShapeView)
+				rect.StrokeWeight = byte(strokeWeight)
+				rect.ForceRedraw()
 			}
-			engine.GetInstance().ForceAllViewsRedraw()
 			engine.RequestRendering()
 			return true
 		}))
