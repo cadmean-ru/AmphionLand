@@ -45,6 +45,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 			box.RemoveAllChildren()
 
 			s.yeetingSceneObject.RemoveComponentByName("Yeeter")
+			s.yeetingSceneObject.AddComponent(&ClickAndInspeceet{})
 			s.yeetingSceneObject.SetParent(box)
 			s.yeetingSceneObject = nil
 			engine.LogDebug("here 1lekj")
