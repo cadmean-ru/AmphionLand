@@ -158,7 +158,5 @@ func OnClick(event engine.AmphionEvent) bool {
 		engine.LogDebug(err.Error())
 	}).Build())
 
-
-
 	return true
 }
