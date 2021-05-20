@@ -12,6 +12,8 @@ type ClickAndInspeceet struct {
 	engine.ComponentImpl
 	editor *EditorController
 	hierarchy *engine.SceneObject
+	showBox bool
+	shape *builtin.ShapeView
 }
 
 func (s *ClickAndInspeceet) OnStart() {
@@ -20,6 +22,7 @@ func (s *ClickAndInspeceet) OnStart() {
 
 	s.editor = engine.FindComponentByName("EditorController").(*EditorController)
 	s.hierarchy = engine.FindObjectByName("Hierarchy")
+	s.shape = s.SceneObject.GetComponentByName("ShapeView").(*builtin.ShapeView)
 }
 
 func (s *ClickAndInspeceet) OnStop() {
@@ -46,6 +49,18 @@ func (s *ClickAndInspeceet) LayoutChildren() {
 		c.Transform.Position = a.ZeroVector()
 		c.Transform.Size = a.ZeroVector()
 	}
+}
+
+func (s *ClickAndInspeceet) ToggleBox() {
+	s.showBox = !s.showBox
+
+	if s.showBox {
+		s.shape.StrokeWeight = 1
+	} else {
+		s.shape.StrokeWeight = 0
+	}
+
+	s.shape.ForceRedraw()
 }
 
 func (s *ClickAndInspeceet) handleClick(event engine.AmphionEvent) bool {
