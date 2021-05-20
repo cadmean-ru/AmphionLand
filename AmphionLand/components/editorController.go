@@ -47,15 +47,22 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	layout.RowPadding = 20
 	rightThing.AddComponent(layout)
 
-	prefab, err := engine.LoadPrefab(res.Prefabs_button)
+	playButton, err := engine.LoadPrefab(res.Prefabs_button)
 
 	if err==nil{
-		prefab.Transform.Size = a.NewVector3(a.MatchParent,50,4)
-		textView := prefab.FindComponentByName("TextView", true).(*builtin.TextView)
-		textView.SetText("Save Prefab")
+		playButton.Transform.Size = a.NewVector3(a.MatchParent,50,4)
+		textView := playButton.FindComponentByName("TextView", true).(*builtin.TextView)
+		textView.SetText("Test app")
 		textView.SetHTextAlign(a.TextAlignCenter)
 		textView.SetVTextAlign(a.TextAlignCenter)
-		rightThing.AddChild(prefab)
+		playButton.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			s.Engine.CloseScene(func() {
+				_= s.Engine.ShowScene(leftScene)
+			})
+			return true
+		}))
+
+		rightThing.AddChild(playButton)
 	}
 
 	prefab2, err2 := engine.LoadPrefab(res.Prefabs_button)
