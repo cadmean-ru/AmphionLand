@@ -26,6 +26,7 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.EditorController{})
 	cm.RegisterComponentType(&components.PrefabViewerController{})
 	cm.RegisterComponentType(&components.ClickAndInspeceet{})
+	cm.RegisterComponentType(&components.WeatherController{})
 	cm.RegisterEventHandler(components.OnClick)
 
 	rpc.Initialize("http://localhost:4200")
