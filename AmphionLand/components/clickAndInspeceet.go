@@ -99,64 +99,62 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 	objectNameBox.AddComponent(objectNameBoxText)
 	s.hierarchy.AddChild(objectNameBox)
 
-	//transMap := map[string]a.Vector3 {
-	//	"Position": object.Transform.Position,
-	//	"Rotation": object.Transform.Rotation,
-	//	"Size":     object.Transform.Size,
-	//}
-	//
-	//i := 0
-	//for vecName, vec := range transMap {
-	//	nameBox := engine.NewSceneObject("nameBox" + string(rune(i)))
-	//	nameBox.Transform.Size.Y = 30
-	//	nameBoxText := builtin.NewTextView(vecName)
-	//	nameBoxText.SetVTextAlign(a.TextAlignCenter)
-	//	nameBoxText.SetHTextAlign(a.TextAlignCenter)
-	//	nameBox.AddComponent(nameBoxText)
-	//	s.hierarchy.AddChild(nameBox)
-	//
-	//	box := engine.NewSceneObject("emptyBox" + string(rune(i)))
-	//	box.Transform.Size.Y = 90
-	//	grid := builtin.NewGridLayout()
-	//	grid.Cols = 2
-	//	grid.Rows = 3
-	//
-	//	box.AddComponent(grid)
-	//
-	//	nameMap := [3]string{"X", "Y", "Z"}
-	//	valueMap := [3]float32{vec.X, vec.Y, vec.Z}
-	//
-	//	for j := 0; j < 3; j++{
-	//		name := engine.NewSceneObject("name" + string(rune(i)) + string(rune(j)))
-	//		nameText := builtin.NewTextView(nameMap[j])
-	//		nameText.SetVTextAlign(a.TextAlignCenter)
-	//		nameText.SetHTextAlign(a.TextAlignCenter)
-	//
-	//		name.AddComponent(nameText)
-	//		name.Transform.Size.Y = 30
-	//
-	//		value := engine.NewSceneObject("value" + string(rune(i)) + string(rune(j)))
-	//		valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f',3,32))
-	//		valueText.SetVTextAlign(a.TextAlignCenter)
-	//		valueText.SetHTextAlign(a.TextAlignCenter)
-	//
-	//		value.AddComponent(valueText)
-	//		value.Transform.Size.Y = 30
-	//		//value.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
-	//
-	//		box.AddChild(name)
-	//		box.AddChild(value)
-	//	}
-	//	s.hierarchy.AddChild(box)
-	//
-	//	i++
-	//}
+	transMap := map[string]a.Vector3 {
+		"Position": object.Transform.Position,
+		"Rotation": object.Transform.Rotation,
+		"Size":     object.Transform.Size,
+	}
+
+	i := 0
+	for vecName, vec := range transMap {
+		nameBox := engine.NewSceneObject("nameBox" + string(rune(i)))
+		nameBox.Transform.Size.Y = 30
+		nameBoxText := builtin.NewTextView(vecName)
+		nameBoxText.SetVTextAlign(a.TextAlignCenter)
+		nameBoxText.SetHTextAlign(a.TextAlignCenter)
+		nameBox.AddComponent(nameBoxText)
+		s.hierarchy.AddChild(nameBox)
+
+		box := engine.NewSceneObject("emptyBox" + string(rune(i)))
+		box.Transform.Size.Y = 90
+		grid := builtin.NewGridLayout()
+		grid.Cols = 2
+		grid.Rows = 3
+
+		box.AddComponent(grid)
+
+		nameMap := [3]string{"X", "Y", "Z"}
+		valueMap := [3]float32{vec.X, vec.Y, vec.Z}
+
+		for j := 0; j < 3; j++{
+			name := engine.NewSceneObject("name" + string(rune(i)) + string(rune(j)))
+			nameText := builtin.NewTextView(nameMap[j])
+			nameText.SetVTextAlign(a.TextAlignCenter)
+			nameText.SetHTextAlign(a.TextAlignCenter)
+
+			name.AddComponent(nameText)
+			name.Transform.Size.Y = 30
+
+			value := engine.NewSceneObject("value" + string(rune(i)) + string(rune(j)))
+			valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f',3,32))
+			valueText.SetVTextAlign(a.TextAlignCenter)
+			valueText.SetHTextAlign(a.TextAlignCenter)
+
+			value.AddComponent(valueText)
+			value.Transform.Size.Y = 30
+			//value.AddComponent(builtin.NewShapeView(builtin.ShapeRectangle))
+
+			box.AddChild(name)
+			box.AddChild(value)
+		}
+		s.hierarchy.AddChild(box)
+
+		i++
+	}
 
 	if object.GetName() == "Horizontal grid" {
 		engine.LogDebug("clicked on hg")
 		gridObject := engine.NewSceneObject("grid bruh")
-
-		colsAmount := object.GetComponentByName("GridLayout", true).(*builtin.GridLayout).Rows
 
 		grid := builtin.NewGridLayout()
 		grid.Cols = 2
@@ -167,14 +165,17 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
 		buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
 
+		actualGrid := object.GetComponentByName("GridLayout", true).(*builtin.GridLayout)
+
 		inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
-		inputText.SetText(strconv.Itoa(colsAmount))
+		inputText.SetText(strconv.Itoa(actualGrid.Cols))
 
 		buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
 
 		buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-			inputObjText,_ := strconv.Atoi(inputText.GetText())
-			object.FindComponentByName("GridLayout").(*builtin.GridLayout).Cols = inputObjText
+			newCols,_ := strconv.Atoi(inputText.GetText())
+			engine.LogDebug("Old cols: %d. New cols: %d", grid.Cols, newCols)
+			actualGrid.Cols = newCols
 			return true
 		}))
 
