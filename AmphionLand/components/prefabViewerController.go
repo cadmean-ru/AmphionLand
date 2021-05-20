@@ -39,14 +39,6 @@ func OnClick(event engine.AmphionEvent) bool {
 		pref = res.(*engine.SceneObject)
 		engine.LogDebug("name " + pref.GetName())
 
-		pref.ForEachObject(func(object *engine.SceneObject) {
-			for _, c := range object.GetComponents(true) {
-				if componentIsNotNecessary(c) {
-					engine.LogDebug("Removing component %v", c)
-					object.RemoveComponent(c)
-				}
-			}
-		}, true)
 
 		pref.AddComponent(&Yeeter{
 			prefId: prefId,
@@ -63,6 +55,21 @@ func OnClick(event engine.AmphionEvent) bool {
 	}).Build())
 
 	return true
+}
+
+func preparePrefabForEditor(pref *engine.SceneObject) {
+	pref.ForEachObject(func(object *engine.SceneObject) {
+		for _, c := range object.GetComponents(true) {
+			if componentIsNotNecessary(c) {
+				engine.LogDebug("Removing component %v", c)
+				object.RemoveComponent(c)
+			}
+		}
+	}, true)
+
+	if pref.GetName() == "Horizontal grid" {
+		pref.AddComponent(NewEditorGrid())
+	}
 }
 
 func componentIsNotNecessary(c engine.Component) bool {

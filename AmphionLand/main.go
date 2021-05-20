@@ -26,6 +26,7 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.EditorController{})
 	cm.RegisterComponentType(&components.PrefabViewerController{})
 	cm.RegisterComponentType(&components.ClickAndInspeceet{})
+	cm.RegisterComponentType(&components.EditorGrid{})
 	cm.RegisterComponentType(&components.WeatherController{})
 	cm.RegisterEventHandler(components.OnClick)
 

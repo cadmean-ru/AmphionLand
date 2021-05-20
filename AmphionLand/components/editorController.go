@@ -15,6 +15,7 @@ type EditorController struct {
 	yeetingSceneObject *engine.SceneObject
 	hierarchy *engine.SceneObject
 	remover bool
+	containerPrefab *engine.SceneObject
 }
 
 func (s *EditorController) OnInit(ctx engine.InitContext) {
@@ -27,8 +28,11 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	view.StrokeWeight = 0
 	leftScene.AddComponent(view)
 	leftScene.AddComponent(builtin.NewGridLayout())
+
+	s.containerPrefab, _ = engine.LoadPrefab(res.Prefabs_editorContainer)
+
 	for i := 0; i < 10; i++ {
-		box := engine.NewSceneObject("emptyBox" + string(rune(i)))
+		box := s.containerPrefab.Copy("emptyBox" + string(rune(i)))
 		rectangle := builtin.NewShapeView(builtin.ShapeRectangle)
 		rectangle.FillColor = a.TransparentColor()
 		rectangle.StrokeColor = a.BlackColor()
@@ -85,21 +89,16 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		textView.SetHTextAlign(a.TextAlignCenter)
 		textView.SetVTextAlign(a.TextAlignCenter)
 
-		flag := false
 		gridViewer.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-			strokeWeight := 0
-			if flag {
-				strokeWeight = 0
-				flag = !flag
-			} else {
-				strokeWeight = 1
-				flag = !flag
-			}
-			for _, box := range leftScene.GetChildren(){
-				rect := box.GetComponentByName("ShapeView").(*builtin.ShapeView)
-				rect.StrokeWeight = byte(strokeWeight)
-				rect.ForceRedraw()
-			}
+			leftScene.ForEachObject(func(object *engine.SceneObject) {
+				comps := object.GetComponentsByName("ClickAndInspeceet")
+				if len(comps) == 0 {
+					return
+				}
+
+				comp := comps[0].(*ClickAndInspeceet)
+				comp.ToggleBox()
+			})
 			engine.RequestRendering()
 			return true
 		}))
