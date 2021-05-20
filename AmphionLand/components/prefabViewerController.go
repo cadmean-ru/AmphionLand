@@ -41,9 +41,9 @@ func OnClick(event engine.AmphionEvent) bool {
 
 		pref.ForEachObject(func(object *engine.SceneObject) {
 			for _, c := range object.GetComponents(true) {
-				if _, isView := c.(engine.ViewComponent); !isView {
+				if componentIsNotNecessary(c) {
 					engine.LogDebug("Removing component %v", c)
-					pref.RemoveComponent(c)
+					object.RemoveComponent(c)
 				}
 			}
 		}, true)
@@ -63,4 +63,11 @@ func OnClick(event engine.AmphionEvent) bool {
 	}).Build())
 
 	return true
+}
+
+func componentIsNotNecessary(c engine.Component) bool {
+	_, isView := c.(engine.ViewComponent)
+	_, isLayout := c.(engine.Layout)
+
+	return !isView && !isLayout
 }

@@ -88,7 +88,7 @@ func (s *ClickAndInspeceet) handleClick(event engine.AmphionEvent) bool {
 
 func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 	object = object.GetChildren()[0]
-
+	engine.LogDebug(object.GetName())
 	s.hierarchy.RemoveAllChildren()
 
 	objectNameBox := engine.NewSceneObject("objectNameBox")
@@ -153,8 +153,10 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 	//}
 
 	if object.GetName() == "Horizontal grid" {
+		engine.LogDebug("clicked on hg")
 		gridObject := engine.NewSceneObject("grid bruh")
-		colsAmount := object.GetComponentByName("GridLayout").(*builtin.GridLayout).Rows
+
+		colsAmount := object.GetComponentByName("GridLayout", true).(*builtin.GridLayout).Rows
 
 		grid := builtin.NewGridLayout()
 		grid.Cols = 2
