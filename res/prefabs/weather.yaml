@@ -16,8 +16,8 @@ children:
         "y": 0
         z: 0
       size:
-        x: $MatchParent
-        "y": $MatchParent
+        x: 50
+        "y": 50
         z: 0
     components:
       - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
@@ -47,8 +47,8 @@ children:
           "y": 0
           z: 0
         size:
-          x: $MatchParent
-          "y": $MatchParent
+          x: 50
+          "y": 50
           z: 0
       components:
         - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
@@ -77,8 +77,8 @@ children:
           "y": 0
           z: 0
         size:
-          x: $MatchParent
-          "y": $MatchParent
+          x: 50
+          "y": 50
           z: 0
       components:
         - name: github.com/cadmean-ru/amphion/engine/builtin.ImageView
@@ -101,8 +101,8 @@ children:
           "y": 0
           z: 0
         size:
-          x: $MatchParent
-          "y": $MatchParent
+          x: 50
+          "y": 50
           z: 0
       components:
         - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
@@ -131,8 +131,8 @@ children:
           "y": 0
           z: 0
         size:
-          x: $MatchParent
-          "y": $MatchParent
+          x: 50
+          "y": 50
           z: 0
       components:
         - name: github.com/cadmean-ru/amphion/engine/builtin.TextView
@@ -160,8 +160,8 @@ children:
         "y": 0
         z: 0
       size:
-        x: $MatchParent
-        "y": $MatchParent
+        x: 50
+        "y": 50
         z: 0
     components:
       - name: github.com/cadmean-ru/amphion/engine/builtin.GridLayout
@@ -175,6 +175,13 @@ components:
     state:
       cols: 1
       rows: 2
+  - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
+    state:
+      fillColor: "#666699"
+      strokeColor: "#666666"
+      strokeWeight: 1
+      pType: 3
+      cornerRadius: 69
 id: 0
 name: WeatherWodget
 transform:
