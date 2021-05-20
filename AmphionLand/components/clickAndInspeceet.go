@@ -167,10 +167,10 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
 		buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
 
-		inputText := inputObj.FindComponentByName("TextView").(*builtin.TextView)
+		inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
 		inputText.SetText(strconv.Itoa(colsAmount))
 
-		buttonObj.FindComponentByName("TextView").(*builtin.TextView).SetText("ok")
+		buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
 
 		buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
 			inputObjText,_ := strconv.Atoi(inputText.GetText())
