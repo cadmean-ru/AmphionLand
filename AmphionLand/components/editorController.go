@@ -90,13 +90,9 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 			savedScene := leftScene.Copy("savedScene")
 			savedScene.ForEachObject(func(object *engine.SceneObject) {
 				if len(object.GetComponentsByName("ClickAndInspeceet", true)) > 0 {
-					if object.GetChildrenCount() == 0 {
-						object.RemoveFromScene()
-					} else {
-						object.GetChildren()[0].SetParent(object.GetParent())
-					}
+					object.RemoveAllComponents()
 				}
-			})
+			}, true)
 
 			yaml, err := savedScene.EncodeToYaml()
 			if err != nil {
@@ -104,7 +100,9 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 			}
 
 			err = ioutil.WriteFile("./savedScene.yaml", yaml, 0644)
-			engine.LogDebug(err.Error())
+			if err != nil{
+				engine.LogDebug(err.Error())
+			}
 
 			return true
 		}))
