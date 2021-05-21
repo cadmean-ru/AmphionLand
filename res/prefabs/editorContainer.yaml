@@ -1,9 +1,5 @@
 children: []
 components:
-  - name: AmphionLand/components.WodgetController
-    state: { }
-  - name: github.com/cadmean-ru/amphion/engine/builtin.MouseMover
-    state: {}
   - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
     state:
       fillColor: "#0000"
@@ -13,7 +9,7 @@ components:
       pType: 3
   - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
     state: { }
-  - name: github.com/cadmean-ru/amphion/engine/builtin.MouseMover
+  - name: ClickAndInspeceet
     state: { }
 id: 0
 name: Prefab container

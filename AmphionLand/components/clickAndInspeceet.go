@@ -12,7 +12,6 @@ type ClickAndInspeceet struct {
 	engine.ComponentImpl
 	editor *EditorController
 	hierarchy *engine.SceneObject
-	showBox bool
 	shape *builtin.ShapeView
 }
 
@@ -52,9 +51,9 @@ func (s *ClickAndInspeceet) LayoutChildren() {
 }
 
 func (s *ClickAndInspeceet) ToggleBox() {
-	s.showBox = !s.showBox
+	showBox := s.editor.showBoxed
 
-	if s.showBox {
+	if showBox {
 		s.shape.StrokeWeight = 1
 	} else {
 		s.shape.StrokeWeight = 0
@@ -94,6 +93,11 @@ func (s *ClickAndInspeceet) handleClick(event engine.AmphionEvent) bool {
 	s.editor.yeetingSceneObject = nil
 
 	engine.LogDebug("here 1lekj")
+
+	if newObj.GetName() == "Horizontal grid" {
+		editorGrid := newObj.GetComponentByName("EditorGrid").(*EditorGrid)
+		editorGrid.MakeClickable()
+	}
 
 	s.showInspector(s.SceneObject)
 

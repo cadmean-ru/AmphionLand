@@ -11,6 +11,8 @@ components:
     state:
       cols: 3
       rows: 1
+  - name: EditorGrid
+    state: {}
 id: 0
 name: Horizontal grid
 transform:

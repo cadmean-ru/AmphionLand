@@ -2,6 +2,7 @@ package components
 
 import (
 	"AmphionLand/generated/res"
+	"fmt"
 	owm "github.com/briandowns/openweathermap"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
@@ -16,6 +17,7 @@ type EditorController struct {
 	hierarchy *engine.SceneObject
 	remover bool
 	containerPrefab *engine.SceneObject
+	showBoxed bool
 }
 
 func (s *EditorController) OnInit(ctx engine.InitContext) {
@@ -29,10 +31,14 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	leftScene.AddComponent(view)
 	leftScene.AddComponent(builtin.NewGridLayout())
 
-	s.containerPrefab, _ = engine.LoadPrefab(res.Prefabs_editorContainer)
+	//s.containerPrefab, _ = engine.LoadPrefab(res.Prefabs_editorContainer)
+	//engine.LogDebug("bruhsdfsd")
+	//for _, c := range s.containerPrefab.GetComponents(true) {
+	//	engine.LogDebug(c.GetName())
+	//}
 
 	for i := 0; i < 10; i++ {
-		box := s.containerPrefab.Copy("emptyBox" + string(rune(i)))
+		box := engine.NewSceneObject(fmt.Sprintf("Box %d", i))
 		rectangle := builtin.NewShapeView(builtin.ShapeRectangle)
 		rectangle.FillColor = a.TransparentColor()
 		rectangle.StrokeColor = a.BlackColor()
@@ -60,8 +66,14 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		textView.SetHTextAlign(a.TextAlignCenter)
 		textView.SetVTextAlign(a.TextAlignCenter)
 		playButton.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-			s.Engine.CloseScene(func() {
-				_= s.Engine.ShowScene(leftScene)
+			engine.CloseScene(func() {
+				newScene := leftScene.Copy(leftScene.GetName())
+				newScene.ForEachObject(func(object *engine.SceneObject) {
+					object.RemoveComponentByName("ClickAndInspeceet")
+					object.RemoveComponentByName("Yeeter")
+					object.RemoveComponentByName("EditorGrid")
+				}, true)
+				_= engine.ShowScene(newScene)
 			})
 			return true
 		}))
@@ -90,6 +102,8 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		textView.SetVTextAlign(a.TextAlignCenter)
 
 		gridViewer.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			s.showBoxed = !s.showBoxed
+
 			leftScene.ForEachObject(func(object *engine.SceneObject) {
 				comps := object.GetComponentsByName("ClickAndInspeceet")
 				if len(comps) == 0 {

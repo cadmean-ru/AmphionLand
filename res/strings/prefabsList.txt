@@ -3,4 +3,3 @@ inputBox
 wodget
 searchBar
 horizontalYeeter
-weather

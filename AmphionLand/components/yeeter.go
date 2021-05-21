@@ -39,6 +39,9 @@ func (y *Yeeter) handleMouseMove(event engine.AmphionEvent) bool {
 
 func (y *Yeeter) handleCancel(event engine.AmphionEvent) bool {
 	keyEvent := event.Data.(engine.KeyEvent)
+
+	engine.LogDebug("Key: %s %s", keyEvent.Key, keyEvent.Code)
+
 	if keyEvent.Key != "Escape" {
 		return true
 	}
