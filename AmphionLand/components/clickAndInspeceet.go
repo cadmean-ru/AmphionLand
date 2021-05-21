@@ -218,6 +218,11 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
 
 		inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
+		objectText := object.FindComponentByName("TextView").(*builtin.TextView).Text
+		engine.LogDebug(objectText)
+		if objectText != "" {
+			inputText.SetText(objectText)
+		}
 
 		buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
 
@@ -225,6 +230,40 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			newText := inputText.GetText()
 			object.FindComponentByName("TextView", true).(*builtin.TextView).SetText(newText)
 			engine.LogDebug("New Text: ", newText)
+			return true
+		}))
+
+		gridObject.AddChild(inputObj)
+		gridObject.AddChild(buttonObj)
+
+		s.hierarchy.AddChild(gridObject)
+	}
+
+	if object.GetName() == "Image Box" {
+		engine.LogDebug("clicked on imageBox")
+		gridObject := engine.NewSceneObject("image bruh")
+
+		grid := builtin.NewGridLayout()
+		grid.Cols = 2
+		grid.Rows = 1
+
+		gridObject.AddComponent(grid)
+
+		inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
+		buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
+
+		inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
+		objectImageURL := object.FindComponentByName("ImageView").(*builtin.ImageView).ImageUrl
+		engine.LogDebug(objectImageURL)
+		if objectImageURL != "" {
+			inputText.SetText(objectImageURL)
+		}
+		buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
+
+		buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			url := "res/images/" + inputText.GetText()
+			object.FindComponentByName("ImageView", true).(*builtin.ImageView).SetImageUrl(url)
+			engine.LogDebug("New url: ", url)
 			return true
 		}))
 

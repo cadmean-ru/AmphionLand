@@ -9,13 +9,6 @@ components:
       text: "This is text"
       hTextAlign: $TextAlignCenter
       vTextAlign: $TextAlignCenter
-  - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
-    state:
-      fillColor: "#fff"
-      strokeColor: "#420"
-      strokeWeight: 1
-      pType: 3
-      cornerRadius: 69
 id: 0
 name: Text Label
 transform:

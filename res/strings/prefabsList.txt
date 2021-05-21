@@ -4,3 +4,4 @@ wodget
 searchBar
 horizontalYeeter
 textLabel
+imageBox
