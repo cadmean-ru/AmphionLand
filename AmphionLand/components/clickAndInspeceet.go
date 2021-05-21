@@ -203,4 +203,34 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 
 		s.hierarchy.AddChild(gridObject)
 	}
+
+	if object.GetName() == "Text Label" {
+		engine.LogDebug("clicked on textlabel")
+		gridObject := engine.NewSceneObject("label bruh")
+
+		grid := builtin.NewGridLayout()
+		grid.Cols = 2
+		grid.Rows = 1
+
+		gridObject.AddComponent(grid)
+
+		inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
+		buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
+
+		inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
+
+		buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
+
+		buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			newText := inputText.GetText()
+			object.FindComponentByName("TextView", true).(*builtin.TextView).SetText(newText)
+			engine.LogDebug("New Text: ", newText)
+			return true
+		}))
+
+		gridObject.AddChild(inputObj)
+		gridObject.AddChild(buttonObj)
+
+		s.hierarchy.AddChild(gridObject)
+	}
 }
