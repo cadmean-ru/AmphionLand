@@ -7,6 +7,7 @@ import (
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
+	"io/ioutil"
 	"strconv"
 	"strings"
 )
@@ -85,6 +86,28 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 
 	if err2==nil{
 		prefab2.Transform.Size = a.NewVector3(a.MatchParent,50,4)
+		prefab2.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+			savedScene := leftScene.Copy("savedScene")
+			savedScene.ForEachObject(func(object *engine.SceneObject) {
+				if len(object.GetComponentsByName("ClickAndInspeceet", true)) > 0 {
+					if object.GetChildrenCount() == 0 {
+						object.RemoveFromScene()
+					} else {
+						object.GetChildren()[0].SetParent(object.GetParent())
+					}
+				}
+			})
+
+			yaml, err := savedScene.EncodeToYaml()
+			if err != nil {
+				return false
+			}
+
+			err = ioutil.WriteFile("./savedScene.yaml", yaml, 0644)
+			engine.LogDebug(err.Error())
+
+			return true
+		}))
 		textView := prefab2.FindComponentByName("TextView", true).(*builtin.TextView)
 		textView.SetText("Save Scene")
 		textView.SetHTextAlign(a.TextAlignCenter)
