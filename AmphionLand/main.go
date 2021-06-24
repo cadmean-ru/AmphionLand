@@ -28,6 +28,7 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.ClickAndInspeceet{})
 	cm.RegisterComponentType(&components.EditorGrid{})
 	cm.RegisterComponentType(&components.WeatherController{})
+	cm.RegisterComponentType(&components.NewScrolling{})
 	cm.RegisterEventHandler(components.OnClick)
 
 	rpc.Initialize("http://localhost:4200")

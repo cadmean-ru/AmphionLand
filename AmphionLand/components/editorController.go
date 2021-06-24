@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type EditorController struct {
@@ -31,6 +32,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	view.StrokeWeight = 0
 	leftScene.AddComponent(view)
 	leftScene.AddComponent(builtin.NewGridLayout())
+	leftScene.AddComponent(&NewScrolling{})
 
 	//s.containerPrefab, _ = engine.LoadPrefab(res.Prefabs_editorContainer)
 	//engine.LogDebug("bruhsdfsd")
@@ -38,7 +40,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	//	engine.LogDebug(c.GetName())
 	//}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 15; i++ {
 		box := engine.NewSceneObject(fmt.Sprintf("Box %d", i))
 		rectangle := builtin.NewShapeView(builtin.ShapeRectangle)
 		rectangle.FillColor = a.TransparentColor()
@@ -211,6 +213,14 @@ func (s *EditorController) OnStart() {
 	} else {
 		engine.LogDebug(err.Error())
 	}
+
+	engine.RunTask(engine.NewTaskBuilder().Run(func() (interface{}, error) {
+		time.Sleep(1000)
+		engine.FindObjectByName("left_scene").ForEachChild(func(box *engine.SceneObject) {
+			engine.LogDebug("min y %f", box.Transform.GetGlobalRect().GetMin().Y)
+		})
+		return nil, nil
+	}).Build())
 }
 
 func (s *EditorController) GetName() string {
