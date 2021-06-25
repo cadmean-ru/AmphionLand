@@ -1,7 +1,6 @@
 package components
 
 import (
-	"AmphionLand/generated/res"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 )
@@ -15,13 +14,25 @@ type LoginSceneController struct {
 func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	l.ComponentImpl.OnInit(ctx)
 
-	radioButt, err := engine.LoadPrefab(res.Prefabs_radioButtonPrefab)
-	if err == nil {
-			l.SceneObject.AddChild(radioButt)
-			engine.LogDebug("Here")
-		} else {
-			engine.LogDebug(err.Error())
-		}
+	//radioButt, err := engine.LoadPrefab(res.Prefabs_radioButtonPrefab)
+	//if err == nil {
+	//	l.SceneObject.AddChild(radioButt)
+	//	engine.LogDebug("Here")
+	//} else {
+	//	engine.LogDebug(err.Error())
+	//}
+
+	obj := engine.NewSceneObject("Radio butts")
+	obj.SetSizeXy(100, 100)
+
+	radioButt := NewRadioButtonGroup()
+	radioButt.AddItem("test 1")
+	radioButt.AddItem("test 2")
+	radioButt.AddItem("test 3")
+
+	obj.AddComponent(radioButt)
+
+	l.SceneObject.AddChild(obj)
 
 	//
 	//wodgetPrefab, err := engine.LoadPrefab(res.Prefabs_wodget)
