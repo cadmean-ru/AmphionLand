@@ -1,0 +1,25 @@
+children: []
+components:
+  - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
+    state: {}
+  - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
+    state: {}
+id: 0
+name: Cirlce Empty
+transform:
+  pivot:
+    x: 0
+    "y": 0
+    z: 0
+  position:
+    x: 0
+    "y": 0
+    z: 1
+  rotation:
+    x: 0
+    "y": 0
+    z: 0
+  size:
+    x: 100
+    "y": 100
+    z: 0

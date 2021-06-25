@@ -15,13 +15,22 @@ type LoginSceneController struct {
 func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	l.ComponentImpl.OnInit(ctx)
 
-	wodgetPrefab, err := engine.LoadPrefab(res.Prefabs_wodget)
+	radioButt, err := engine.LoadPrefab(res.Prefabs_radioButtonPrefab)
 	if err == nil {
-		l.SceneObject.AddChild(wodgetPrefab)
-		engine.LogDebug("Here")
-	} else {
-		engine.LogDebug(err.Error())
-	}
+			l.SceneObject.AddChild(radioButt)
+			engine.LogDebug("Here")
+		} else {
+			engine.LogDebug(err.Error())
+		}
+
+	//
+	//wodgetPrefab, err := engine.LoadPrefab(res.Prefabs_wodget)
+	//if err == nil {
+	//	l.SceneObject.AddChild(wodgetPrefab)
+	//	engine.LogDebug("Here")
+	//} else {
+	//	engine.LogDebug(err.Error())
+	//}
 
 	//wodget := engine.NewSceneObject("wodget")
 	//wodget.Transform.Size = a.NewVector3(68, 68, 0)
