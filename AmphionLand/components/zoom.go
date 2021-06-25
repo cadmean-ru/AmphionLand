@@ -20,7 +20,7 @@ func (s *Zooming) OnInit(ctx engine.InitContext) {
 			for _, component:= range s.SceneObject.GetComponentsByName(".*TextView"){
 				if view, ok := component.(*builtin.TextView); ok {
 					view.FontSize *= byte(s.ZoomNumber)
-					view.ForceRedraw()
+					view.Redraw()
 					engine.RequestRendering()
 				}
 			}
@@ -33,7 +33,7 @@ func (s *Zooming) OnInit(ctx engine.InitContext) {
 			for _, component:= range s.SceneObject.GetComponentsByName(".*TextView"){
 				if view, ok := component.(*builtin.TextView); ok {
 					view.FontSize /= byte(s.ZoomNumber)
-					view.ForceRedraw()
+					view.Redraw()
 					engine.RequestRendering()
 				}
 			}

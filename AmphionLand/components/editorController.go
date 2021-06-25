@@ -161,7 +161,7 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 				prefabRemoveShapeView.FillColor = a.NewColor(50,50,50)
 			}
 			s.remover = !s.remover
-			prefabRemoveShapeView.ForceRedraw()
+			prefabRemoveShapeView.Redraw()
 			engine.RequestRendering()
 			return true
 		}))

@@ -59,7 +59,7 @@ func (s *ClickAndInspeceet) ToggleBox() {
 		s.shape.StrokeWeight = 0
 	}
 
-	s.shape.ForceRedraw()
+	s.shape.Redraw()
 }
 
 func (s *ClickAndInspeceet) handleClick(event engine.AmphionEvent) bool {

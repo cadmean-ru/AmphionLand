@@ -33,7 +33,7 @@ func (s *Selection) OnInit(ctx engine.InitContext) {
 					view.TextColor = a.RedColor()
 
 					s.flag = true
-					view.ForceRedraw()
+					view.Redraw()
 					engine.RequestRendering()
 				}
 			})
@@ -41,7 +41,7 @@ func (s *Selection) OnInit(ctx engine.InitContext) {
 			s.flag = false
 			s.componentData.TextColor = s.color
 
-			s.componentData.ForceRedraw()
+			s.componentData.Redraw()
 			engine.RequestRendering()
 		}
 
