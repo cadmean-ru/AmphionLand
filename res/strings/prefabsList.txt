@@ -4,5 +4,4 @@ wodget
 searchBar
 horizontalYeeter
 textLabel
-radioButtonPrefab
 imageBox
