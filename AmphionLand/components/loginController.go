@@ -1,7 +1,7 @@
 package components
 
 import (
-	"AmphionLand/res"
+	"AmphionLand/generated/res"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 )
@@ -10,6 +10,7 @@ type LoginSceneController struct {
 	engine.ComponentImpl
 	emailInput *builtin.NativeInputView
 	passwordInput *builtin.NativeInputView
+	paddingObject *engine.SceneObject
 }
 
 func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
@@ -42,6 +43,22 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	}))
 	butt.Transform.Position.X = 200
 	l.SceneObject.AddChild(butt)
+
+	l.paddingObject = engine.NewSceneObject("padding")
+	l.paddingObject.AddComponent(NewPadding())
+	l.paddingObject.AddComponent(builtin.NewBoundaryView())
+	butt.AddComponent(builtin.NewBoundaryView())
+	l.SceneObject.AddChild(l.paddingObject)
+
+	butt2, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	butt2.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event2 engine.AmphionEvent) bool {
+		engine.LogDebug("butt 2")
+		return true
+	}))
+	butt2.FindComponentByName("TextView", true).(*builtin.TextView).SetText("butt2")
+	l.paddingObject.AddChild(butt2)
+
+
 	//
 	//wodgetPrefab, err := engine.LoadPrefab(res.Prefabs_wodget)
 	//if err == nil {
@@ -66,6 +83,11 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 
 func (l *LoginSceneController) OnStart() {
 	engine.LogDebug("OnStart 2")
+	paddingComponent := l.paddingObject.FindComponentByName("Padding", true).(*Padding)
+	paddingComponent.LeftX = 100
+	paddingComponent.UpY = 100
+	paddingComponent.DownY = 50
+	paddingComponent.UpdatePadding()
 }
 
 func (l *LoginSceneController) GetName() string {
