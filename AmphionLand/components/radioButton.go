@@ -178,3 +178,11 @@ func NewRadioButton(item RadioItem) *RadioButton {
 		item: item,
 	}
 }
+
+func (s *RadioButtonGroup) SelectedItemText() string {
+	if s.selectedIndex != -1 {
+		return s.items[s.selectedIndex].text
+	} else {
+		return ""
+	}
+}

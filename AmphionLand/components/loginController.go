@@ -1,6 +1,7 @@
 package components
 
 import (
+	"AmphionLand/res"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 )
@@ -34,6 +35,13 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 
 	l.SceneObject.AddChild(obj)
 
+	butt, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+		engine.LogDebug(radioButt.SelectedItemText())
+		return true
+	}))
+	butt.Transform.Position.X = 200
+	l.SceneObject.AddChild(butt)
 	//
 	//wodgetPrefab, err := engine.LoadPrefab(res.Prefabs_wodget)
 	//if err == nil {
