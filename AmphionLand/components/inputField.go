@@ -49,7 +49,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			// text := atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
 
 			var bruh = regregexp.MustCompile("[\n ]").Split(string(s.text), -1)
-			engine.LogDebug("width: %+v", bruh)
+			engine.LogDebug("widdddddddth: %+v", bruh)
 			pressedKey := keyDownEvent.Data.(engine.KeyEvent)
 			engine.LogDebug(pressedKey.Key)
 			//engine.LogDebug("width: %+v", text.GetSize())

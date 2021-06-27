@@ -30,6 +30,9 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.WeatherController{})
 	cm.RegisterComponentType(&components.NewScrolling{})
 	cm.RegisterEventHandler(components.OnClick)
+	cm.RegisterComponentType(&components.RadioButton{})
+	cm.RegisterComponentType(&components.RadioButtonGroup{})
+	cm.RegisterComponentType(&components.Padding{})
 
 	rpc.Initialize("http://localhost:4200")
 }
