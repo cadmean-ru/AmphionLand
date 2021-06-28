@@ -32,7 +32,8 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	view.StrokeWeight = 0
 	leftScene.AddComponent(view)
 	leftScene.AddComponent(builtin.NewGridLayout())
-	leftScene.AddComponent(&NewScrolling{})
+
+	engine.GetCurrentScene().AddComponent(NewNewNewScrollManager())
 
 	//s.containerPrefab, _ = engine.LoadPrefab(res.Prefabs_editorContainer)
 	//engine.LogDebug("bruhsdfsd")
