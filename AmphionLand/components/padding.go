@@ -31,6 +31,8 @@ func NewPadding() *Padding {
 func (s *Padding) UpdatePadding() {
 	child := s.SceneObject.GetChildren()[0]
 
+	s.SceneObject.Transform.Size = child.Transform.Size
+
 	s.SceneObject.Transform.Size.X += s.LeftX
 	child.Transform.Position.X += s.LeftX
 

@@ -60,6 +60,11 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			if len([]rune(pressedKey)) == 1 {
 				s.text = append(s.text, []rune(pressedKey)...)
 				s.textView.SetText(string(s.text))
+
+				for i := 0; i < len(s.text); i++ {
+					engine.LogDebug(string(s.text[i]))
+				}
+
 			} else if len(s.text) > 0 && pressedKey == "Backspace" {
 				//if s.text[len(s.text) - 1] == '\n' {
 				//	s.text = s.text[:len(s.text) - 2]
