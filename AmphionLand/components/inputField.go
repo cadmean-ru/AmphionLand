@@ -50,24 +50,24 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 
 			var bruh = regregexp.MustCompile("[\n ]").Split(string(s.text), -1)
 			engine.LogDebug("widdddddddth: %+v", bruh)
-			pressedKey := keyDownEvent.Data.(engine.KeyEvent)
-			engine.LogDebug(pressedKey.Key)
+			pressedKey := keyDownEvent.StringData()
+			engine.LogDebug(pressedKey)
 			//engine.LogDebug("width: %+v", text.GetSize())
 			//GetTextWidth(bruh[len(bruh) - 1]))
 			//if GetTextWidth(bruh[len(bruh) - 1]) > (s.SceneObject.Transform.GetGlobalRect().X.Max - s.SceneObject.Transform.GetGlobalRect().X.Min - 15) && pressedKey.Key != "Backspace" {
 			//	s.text = append(s.text, '\n')
 			//}
-			if len([]rune(pressedKey.Key)) == 1 {
-				s.text = append(s.text, []rune(pressedKey.Key)...)
+			if len([]rune(pressedKey)) == 1 {
+				s.text = append(s.text, []rune(pressedKey)...)
 				s.textView.SetText(string(s.text))
-			} else if len(s.text) > 0 && pressedKey.Key == "Backspace" {
+			} else if len(s.text) > 0 && pressedKey == "Backspace" {
 				//if s.text[len(s.text) - 1] == '\n' {
 				//	s.text = s.text[:len(s.text) - 2]
 				//} else {
 					s.text = s.text[:len(s.text) - 1]
 				//}
 				s.textView.SetText(string(s.text))
-			} else if strings.HasPrefix(pressedKey.Code, "Enter") {
+			} else if strings.HasPrefix(pressedKey, "Enter") {
 				s.text = append(s.text, '\n')
 				s.textView.SetText(string(s.text))
 			}

@@ -33,6 +33,21 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	leftScene.AddComponent(view)
 	leftScene.AddComponent(builtin.NewGridLayout())
 
+	engine.BindEventHandler(engine.EventKeyDown, func(event engine.AmphionEvent) bool {
+		engine.LogDebug("key pressed: %s", event.StringData())
+		return true
+	})
+
+	engine.BindEventHandler(engine.EventKeyUp, func(event engine.AmphionEvent) bool {
+		engine.LogDebug("key released: %s", event.StringData())
+		return true
+	})
+
+	engine.BindEventHandler(engine.EventTextInput, func(event engine.AmphionEvent) bool {
+		engine.LogDebug("text input: %s", string(event.StringData()))
+		return true
+	})
+
 	engine.GetCurrentScene().AddComponent(NewNewNewScrollManager())
 
 	//s.containerPrefab, _ = engine.LoadPrefab(res.Prefabs_editorContainer)
