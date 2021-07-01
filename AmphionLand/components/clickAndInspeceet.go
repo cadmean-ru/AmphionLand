@@ -1,7 +1,7 @@
 package components
 
 import (
-	"AmphionLand/generated/res"
+	"fmt"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
@@ -134,7 +134,7 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		nameBox.AddComponent(nameBoxText)
 		s.hierarchy.AddChild(nameBox)
 
-		box := engine.NewSceneObject("emptyBox" + string(rune(i)))
+		box := engine.NewSceneObject(fmt.Sprintf("emptyBox %d", i))
 		box.Transform.Size.Y = 90
 		grid := builtin.NewGridLayout()
 		grid.Cols = 2
@@ -171,105 +171,162 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		i++
 	}
 
-	if object.GetName() == "Horizontal grid" {
-		engine.LogDebug("clicked on hg")
-		gridObject := engine.NewSceneObject("grid bruh")
+	components := object.GetComponents()
+	cm := engine.GetInstance().GetComponentsManager()
+	for _, comp := range components {
 
+		componentsSomething := engine.NewSceneObject("King of components " + comp.GetName())
+
+		publics := cm.GetComponentState(comp)
+		componentsSomething.Transform.Size.Y = float32(30 * (len(publics) + 1))
 		grid := builtin.NewGridLayout()
 		grid.Cols = 2
-		grid.Rows = 1
 
-		gridObject.AddComponent(grid)
+		componentsSomething.AddComponent(grid)
 
-		inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
-		buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
+		nameBoxLabel := engine.NewSceneObject("nameBoxLabel")
+		nameBoxLabel.Transform.Size.Y = 30
+		nameBoxLabelText := builtin.NewTextView("Name: ")
+		nameBoxLabelText.SetVTextAlign(a.TextAlignCenter)
+		nameBoxLabelText.SetHTextAlign(a.TextAlignLeft)
+		nameBoxLabel.AddComponent(nameBoxLabelText)
+		componentsSomething.AddChild(nameBoxLabel)
 
-		actualGrid := object.GetComponentByName("GridLayout", true).(*builtin.GridLayout)
+		nameBox := engine.NewSceneObject("nameBox " + comp.GetName())
+		nameBox.Transform.Size.Y = 30
+		nameBoxText := builtin.NewTextView(comp.GetName())
+		nameBoxText.SetVTextAlign(a.TextAlignCenter)
+		nameBoxText.SetHTextAlign(a.TextAlignRight)
+		nameBox.AddComponent(nameBoxText)
+		componentsSomething.AddChild(nameBox)
 
-		inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
-		inputText.SetText(strconv.Itoa(actualGrid.Cols))
+		s.hierarchy.AddChild(componentsSomething)
 
-		buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
+		for name, public := range publics {
+			stateLabel := engine.NewSceneObject("stateLabel " + name)
+			stateLabel.Transform.Size.Y = 30
+			stateLabelText := builtin.NewTextView(name)
+			stateLabelText.SetHTextAlign(a.TextAlignLeft)
+			stateLabelText.SetVTextAlign(a.TextAlignCenter)
+			stateLabel.AddComponent(stateLabelText)
+			componentsSomething.AddChild(stateLabel)
 
-		buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-			newCols,_ := strconv.Atoi(inputText.GetText())
-			engine.LogDebug("Old cols: %d. New cols: %d", grid.Cols, newCols)
-			actualGrid.Cols = newCols
-			return true
-		}))
+			stateInput := engine.NewSceneObject("stateInput" + name)
+			stateInput.Transform.Size.Y = 30
+			stateLabelInput := builtin.NewTextView(fmt.Sprintf("%+v", public))
+			stateLabelInput.SetHTextAlign(a.TextAlignRight)
+			stateLabelInput.SetVTextAlign(a.TextAlignCenter)
+			stateInput.AddComponent(stateLabelInput)
+			componentsSomething.AddChild(stateInput)
 
-		gridObject.AddChild(inputObj)
-		gridObject.AddChild(buttonObj)
+			switch public.(type) {
+			case string:
 
-		s.hierarchy.AddChild(gridObject)
-	}
+			}
 
-	if object.GetName() == "Text Label" {
-		engine.LogDebug("clicked on textlabel")
-		gridObject := engine.NewSceneObject("label bruh")
-
-		grid := builtin.NewGridLayout()
-		grid.Cols = 2
-		grid.Rows = 1
-
-		gridObject.AddComponent(grid)
-
-		inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
-		buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
-
-		inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
-		objectText := object.FindComponentByName("TextView").(*builtin.TextView).Text
-		engine.LogDebug(objectText)
-		if objectText != "" {
-			inputText.SetText(objectText)
+			engine.LogDebug("pub %s %v", name, public)
 		}
-
-		buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
-
-		buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-			newText := inputText.GetText()
-			object.FindComponentByName("TextView", true).(*builtin.TextView).SetText(newText)
-			engine.LogDebug("New Text: ", newText)
-			return true
-		}))
-
-		gridObject.AddChild(inputObj)
-		gridObject.AddChild(buttonObj)
-
-		s.hierarchy.AddChild(gridObject)
 	}
 
-	if object.GetName() == "Image Box" {
-		engine.LogDebug("clicked on imageBox")
-		gridObject := engine.NewSceneObject("image bruh")
-
-		grid := builtin.NewGridLayout()
-		grid.Cols = 2
-		grid.Rows = 1
-
-		gridObject.AddComponent(grid)
-
-		inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
-		buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
-
-		inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
-		objectImageURL := object.FindComponentByName("ImageView").(*builtin.ImageView).ImageUrl
-		engine.LogDebug(objectImageURL)
-		if objectImageURL != "" {
-			inputText.SetText(objectImageURL)
-		}
-		buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
-
-		buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-			url := "res/images/" + inputText.GetText()
-			object.FindComponentByName("ImageView", true).(*builtin.ImageView).SetImageUrl(url)
-			engine.LogDebug("New url: ", url)
-			return true
-		}))
-
-		gridObject.AddChild(inputObj)
-		gridObject.AddChild(buttonObj)
-
-		s.hierarchy.AddChild(gridObject)
-	}
+	//if object.GetName() == "Horizontal grid" {
+	//	engine.LogDebug("clicked on hg")
+	//	gridObject := engine.NewSceneObject("grid bruh")
+	//
+	//	grid := builtin.NewGridLayout()
+	//	grid.Cols = 2
+	//	grid.Rows = 1
+	//
+	//	gridObject.AddComponent(grid)
+	//
+	//	inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
+	//	buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
+	//
+	//	actualGrid := object.GetComponentByName("GridLayout", true).(*builtin.GridLayout)
+	//
+	//	inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
+	//	inputText.SetText(strconv.Itoa(actualGrid.Cols))
+	//
+	//	buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
+	//
+	//	buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+	//		newCols,_ := strconv.Atoi(inputText.GetText())
+	//		engine.LogDebug("Old cols: %d. New cols: %d", grid.Cols, newCols)
+	//		actualGrid.Cols = newCols
+	//		return true
+	//	}))
+	//
+	//	gridObject.AddChild(inputObj)
+	//	gridObject.AddChild(buttonObj)
+	//
+	//	s.hierarchy.AddChild(gridObject)
+	//}
+	//
+	//if object.GetName() == "Text Label" {
+	//	engine.LogDebug("clicked on textlabel")
+	//	gridObject := engine.NewSceneObject("label bruh")
+	//
+	//	grid := builtin.NewGridLayout()
+	//	grid.Cols = 2
+	//	grid.Rows = 1
+	//
+	//	gridObject.AddComponent(grid)
+	//
+	//	inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
+	//	buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
+	//
+	//	inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
+	//	objectText := object.FindComponentByName("TextView").(*builtin.TextView).Text
+	//	engine.LogDebug(objectText)
+	//	if objectText != "" {
+	//		inputText.SetText(objectText)
+	//	}
+	//
+	//	buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
+	//
+	//	buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+	//		newText := inputText.GetText()
+	//		object.FindComponentByName("TextView", true).(*builtin.TextView).SetText(newText)
+	//		engine.LogDebug("New Text: ", newText)
+	//		return true
+	//	}))
+	//
+	//	gridObject.AddChild(inputObj)
+	//	gridObject.AddChild(buttonObj)
+	//
+	//	s.hierarchy.AddChild(gridObject)
+	//}
+	//
+	//if object.GetName() == "Image Box" {
+	//	engine.LogDebug("clicked on imageBox")
+	//	gridObject := engine.NewSceneObject("image bruh")
+	//
+	//	grid := builtin.NewGridLayout()
+	//	grid.Cols = 2
+	//	grid.Rows = 1
+	//
+	//	gridObject.AddComponent(grid)
+	//
+	//	inputObj, _ := engine.LoadPrefab(res.Prefabs_inputBox)
+	//	buttonObj, _ := engine.LoadPrefab(res.Prefabs_button)
+	//
+	//	inputText := inputObj.FindComponentByName("TextView", true).(*builtin.TextView)
+	//	objectImageURL := object.FindComponentByName("ImageView").(*builtin.ImageView).ImageUrl
+	//	engine.LogDebug(objectImageURL)
+	//	if objectImageURL != "" {
+	//		inputText.SetText(objectImageURL)
+	//	}
+	//	buttonObj.FindComponentByName("TextView", true).(*builtin.TextView).SetText("ok")
+	//
+	//	buttonObj.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+	//		url := "res/images/" + inputText.GetText()
+	//		object.FindComponentByName("ImageView", true).(*builtin.ImageView).SetImageUrl(url)
+	//		engine.LogDebug("New url: ", url)
+	//		return true
+	//	}))
+	//
+	//	gridObject.AddChild(inputObj)
+	//	gridObject.AddChild(buttonObj)
+	//
+	//	s.hierarchy.AddChild(gridObject)
+	//}
 }

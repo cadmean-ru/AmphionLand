@@ -22,7 +22,7 @@ type InputField struct {
 func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
-	s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("github.com/cadmean-ru/amphion/engine/builtin.TextView", true).(*builtin.TextView)
+	s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("TextView", true).(*builtin.TextView)
 
 	s.font, _ = atext.ParseFont(atext.DefaultFontData)
 	s.face = s.font.NewFace(int(s.textView.FontSize))

@@ -33,6 +33,7 @@ func (s *NewScrolling) OnStart(){
 	engine.BindEventHandler(engine.EventMouseScroll, func(event engine.AmphionEvent) bool {
 		o := event.Data.(a.Vector2)
 		dOffset := a.NewVector3(o.X, o.Y, 0)
+		engine.LogDebug("%f", o)
 
 		//engine.LogDebug("Scroll: %f %f", dOffset.X, dOffset.Y)
 
@@ -70,14 +71,14 @@ func (s *NewScrolling) OnStart(){
 
 		scene.ForEachObject(func(object *engine.SceneObject) {
 			if strings.Contains(object.GetName(), "Box"){
-				engine.LogDebug("va %f %f", visibleArea.Y.Min, visibleArea.Y.Max)
+				//engine.LogDebug("va %f %f", visibleArea.Y.Min, visibleArea.Y.Max)
 				//engine.LogDebug("%f %f \n" + object.GetName(), object.Transform.GetGlobalRect().Y.Min, object.Transform.GetGlobalRect().Y.Max)
 			}
 
 			rect := object.Transform.GetGlobalRect()
 			if !visibleArea.IsRectInside(rect) {
 				if strings.Contains(object.GetName(), "Box"){
-					engine.LogDebug("%f %f \n" + object.GetName(), object.Transform.GetGlobalRect().Y.Min, object.Transform.GetGlobalRect().Y.Max)
+					//engine.LogDebug("%f %f \n" + object.GetName(), object.Transform.GetGlobalRect().Y.Min, object.Transform.GetGlobalRect().Y.Max)
 					//engine.LogDebug(object.GetName())
 				}
 
@@ -87,7 +88,7 @@ func (s *NewScrolling) OnStart(){
 					if canScrollDown {
 						//if strings.Contains(object.GetName(), "Box"){
 						//	engine.LogDebug("%f %f \n" + object.GetName() + " csd", object.Transform.GetGlobalRect().Y.Min, object.Transform.GetGlobalRect().Y.Max)
-							engine.LogDebug(object.GetName() + " csd")
+						//	engine.LogDebug(object.GetName() + " csd")
 						//}
 						m := float32(math.Min(math.Abs(float64(rect.Y.Min-visibleArea.Y.Max)), math.Abs(float64(rect.Y.Max-visibleArea.Y.Max))))
 						if minOutY == -1 || m < minOutY {
