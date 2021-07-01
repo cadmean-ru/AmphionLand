@@ -4,6 +4,7 @@ import (
 	"AmphionLand/generated/res"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
+	"strconv"
 )
 
 type LoginSceneController struct {
@@ -15,14 +16,6 @@ type LoginSceneController struct {
 
 func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	l.ComponentImpl.OnInit(ctx)
-
-	//radioButt, err := engine.LoadPrefab(res.Prefabs_radioButtonPrefab)
-	//if err == nil {
-	//	l.SceneObject.AddChild(radioButt)
-	//	engine.LogDebug("Here")
-	//} else {
-	//	engine.LogDebug(err.Error())
-	//}
 
 	//obj := engine.NewSceneObject("Radio butts")
 	//obj.SetSizeXy(100, 100)
@@ -44,38 +37,62 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	//butt.Transform.Position.X = 200
 	//l.SceneObject.AddChild(butt)
 
-	bigGridObj := engine.NewSceneObject("bigGrid")
-	bigGridObj.AddComponent(builtin.NewGridLayout())
+	checkBoxObj := engine.NewSceneObject("Check butts")
+	checkBoxObj.SetSizeXy(100, 100)
+
+	checkButt := NewCheckBoxGroup()
+	checkButt.AddItem("test 1")
+	checkButt.AddItem("test 2")
+	checkButt.AddItem("test 3")
+
+	checkBoxObj.AddComponent(checkButt)
+
+	l.SceneObject.AddChild(checkBoxObj)
+
+	butt, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+		indexes := ""
+		for i := 0; i < len(checkButt.selectedIndexes); i++ {
+			indexes += strconv.Itoa(checkButt.selectedIndexes[i]) + " "
+		}
+		engine.LogDebug(indexes)
+		return true
+	}))
+	butt.Transform.Position.X = 200
+	l.SceneObject.AddChild(butt)
+
+	//bigGridObj := engine.NewSceneObject("bigGrid")
+	//bigGridObj.AddComponent(builtin.NewGridLayout())
 	//bigGrid := bigGridObj.GetComponentByName("GridLayout", true).(*builtin.GridLayout)
 	//bigGrid.Cols = 3
 	//bigGrid.Rows = 3
 	//bigGrid.RowPadding = 10
 	//bigGrid.ColPadding = 10
 
-	l.SceneObject.AddChild(bigGridObj)
+	//l.SceneObject.AddChild(bigGridObj)
 
-	butt3, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	//butt3, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
 	//bigGridObj.AddChild(butt3)
 
-	paddingObject2 := engine.NewSceneObject("padding2")
-	paddingObject2.AddComponent(NewPadding())
-	paddingObject2.AddComponent(builtin.NewBoundaryView())
-	paddingObject2.AddChild(butt3)
-	bigGridObj.AddChild(paddingObject2)
+	//paddingObject2 := engine.NewSceneObject("padding2")
+	//paddingObject2.AddComponent(NewPadding())
+	//paddingObject2.AddComponent(builtin.NewBoundaryView())
+	//paddingObject2.AddChild(butt3)
+	//bigGridObj.AddChild(paddingObject2)
 
-	l.paddingObject = engine.NewSceneObject("padding")
-	l.paddingObject.AddComponent(NewPadding())
-	l.paddingObject.AddComponent(builtin.NewBoundaryView())
-	bigGridObj.AddChild(l.paddingObject)
+	//l.paddingObject = engine.NewSceneObject("padding")
+	//l.paddingObject.AddComponent(NewPadding())
+	//l.paddingObject.AddComponent(builtin.NewBoundaryView())
+	//l.SceneObject.AddChild(l.paddingObject)
 
-	butt2, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
-	butt2.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event2 engine.AmphionEvent) bool {
-		engine.LogDebug("butt 2")
-		return true
-	}))
-	butt2.FindComponentByName("TextView", true).(*builtin.TextView).SetText("butt2")
-	l.paddingObject.AddChild(butt2)
-
+	//butt2, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	//butt2.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event2 engine.AmphionEvent) bool {
+	//	engine.LogDebug("butt 2")
+	//	return true
+	//}))
+	//butt2.FindComponentByName("TextView", true).(*builtin.TextView).SetText("butt2")
+	////l.paddingObject.AddChild(butt2)
+	//l.paddingObject.AddChild(butt2)
 
 
 	//
@@ -102,12 +119,12 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 
 func (l *LoginSceneController) OnStart() {
 	engine.LogDebug("OnStart 2")
-	paddingComponent := l.paddingObject.FindComponentByName("Padding", true).(*Padding)
-	paddingComponent.LeftX = 100
-	paddingComponent.UpY = 100
-	paddingComponent.DownY = 50
-	paddingComponent.RightX = 25
-	paddingComponent.UpdatePadding()
+	//paddingComponent := l.paddingObject.FindComponentByName("Padding", true).(*Padding)
+	//paddingComponent.LeftX = 100
+	//paddingComponent.UpY = 100
+	//paddingComponent.DownY = 50
+	//paddingComponent.RightX = 25
+	//paddingComponent.UpdatePadding()
 }
 
 func (l *LoginSceneController) GetName() string {
