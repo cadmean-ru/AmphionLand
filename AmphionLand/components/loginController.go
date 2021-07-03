@@ -4,7 +4,6 @@ import (
 	"AmphionLand/generated/res"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
-	"strconv"
 )
 
 type LoginSceneController struct {
@@ -37,62 +36,62 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	//butt.Transform.Position.X = 200
 	//l.SceneObject.AddChild(butt)
 
-	checkBoxObj := engine.NewSceneObject("Check butts")
-	checkBoxObj.SetSizeXy(100, 100)
+	//checkBoxObj := engine.NewSceneObject("Check butts")
+	//checkBoxObj.SetSizeXy(100, 100)
+	//
+	//checkButt := NewCheckBoxGroup()
+	//checkButt.AddItem("test 1")
+	//checkButt.AddItem("test 2")
+	//checkButt.AddItem("test 3")
+	//
+	//checkBoxObj.AddComponent(checkButt)
+	//
+	//l.SceneObject.AddChild(checkBoxObj)
 
-	checkButt := NewCheckBoxGroup()
-	checkButt.AddItem("test 1")
-	checkButt.AddItem("test 2")
-	checkButt.AddItem("test 3")
+	//butt, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	//butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+	//	indexes := ""
+	//	for i := 0; i < len(checkButt.selectedIndexes); i++ {
+	//		indexes += strconv.Itoa(checkButt.selectedIndexes[i]) + " "
+	//	}
+	//	engine.LogDebug(indexes)
+	//	return true
+	//}))
+	//butt.Transform.Position.X = 200
+	//l.SceneObject.AddChild(butt)
 
-	checkBoxObj.AddComponent(checkButt)
-
-	l.SceneObject.AddChild(checkBoxObj)
-
-	butt, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
-	butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-		indexes := ""
-		for i := 0; i < len(checkButt.selectedIndexes); i++ {
-			indexes += strconv.Itoa(checkButt.selectedIndexes[i]) + " "
-		}
-		engine.LogDebug(indexes)
-		return true
-	}))
-	butt.Transform.Position.X = 200
-	l.SceneObject.AddChild(butt)
-
-	//bigGridObj := engine.NewSceneObject("bigGrid")
-	//bigGridObj.AddComponent(builtin.NewGridLayout())
-	//bigGrid := bigGridObj.GetComponentByName("GridLayout", true).(*builtin.GridLayout)
-	//bigGrid.Cols = 3
-	//bigGrid.Rows = 3
+	bigGridObj := engine.NewSceneObject("bigGrid")
+	bigGridObj.AddComponent(builtin.NewGridLayout())
+	bigGrid := bigGridObj.GetComponentByName("GridLayout", true).(*builtin.GridLayout)
+	bigGrid.Cols = 3
+	bigGrid.Rows = 3
 	//bigGrid.RowPadding = 10
 	//bigGrid.ColPadding = 10
 
-	//l.SceneObject.AddChild(bigGridObj)
+	l.SceneObject.AddChild(bigGridObj)
 
-	//butt3, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	butt3, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	butt3.FindComponentByName("TextView", true).(*builtin.TextView).SetText("butt3")
 	//bigGridObj.AddChild(butt3)
 
-	//paddingObject2 := engine.NewSceneObject("padding2")
-	//paddingObject2.AddComponent(NewPadding())
-	//paddingObject2.AddComponent(builtin.NewBoundaryView())
-	//paddingObject2.AddChild(butt3)
-	//bigGridObj.AddChild(paddingObject2)
+	paddingObject2 := engine.NewSceneObject("padding2")
+	paddingObject2.AddComponent(NewPadding())
+	paddingObject2.AddComponent(builtin.NewBoundaryView())
+	paddingObject2.AddChild(butt3)
+	bigGridObj.AddChild(paddingObject2)
 
-	//l.paddingObject = engine.NewSceneObject("padding")
-	//l.paddingObject.AddComponent(NewPadding())
-	//l.paddingObject.AddComponent(builtin.NewBoundaryView())
-	//l.SceneObject.AddChild(l.paddingObject)
-
-	//butt2, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
+	butt2, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
 	//butt2.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event2 engine.AmphionEvent) bool {
 	//	engine.LogDebug("butt 2")
 	//	return true
 	//}))
-	//butt2.FindComponentByName("TextView", true).(*builtin.TextView).SetText("butt2")
-	////l.paddingObject.AddChild(butt2)
+	butt2.FindComponentByName("TextView", true).(*builtin.TextView).SetText("butt2")
 	//l.paddingObject.AddChild(butt2)
+	l.paddingObject = engine.NewSceneObject("padding")
+	l.paddingObject.AddComponent(NewPadding())
+	l.paddingObject.AddComponent(builtin.NewBoundaryView())
+	l.paddingObject.AddChild(butt2)
+	bigGridObj.AddChild(l.paddingObject)
 
 
 	//

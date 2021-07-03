@@ -1,0 +1,25 @@
+children: []
+components:
+  - name: github.com/cadmean-ru/amphion/engine/builtin.BoundaryView
+    state: { }
+  - name: AmphionLand/components.NewSceneController
+    state: { }
+id: 0
+name: Login
+transform:
+  pivot:
+    x: 0
+    "y": 0
+    z: 0
+  position:
+    x: 0
+    "y": 0
+    z: 0
+  rotation:
+    x: 0
+    "y": 0
+    z: 0
+  size:
+    x: 1
+    "y": 1
+    z: 1
