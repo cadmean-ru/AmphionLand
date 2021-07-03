@@ -21,12 +21,15 @@ type InputField struct {
 }
 
 func (s *InputField) CursorUpdate() {
-	if s.cursorHelper != nil{
-		at := atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
-		var x = at.GetCharAt(at.GetCharsCount() - 1).GetGlyph().GetWidth()
-		var y = (len(s.cursorHelper) - 1) * s.face.GetSize()
-		engine.LogDebug("cap=%v", x)
-		s.cursor.SetPositionXy(float32(x), float32(y))
+	if s.cursorHelper != nil {
+		if s.text != nil {
+			at := atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+			var x = at.GetCharAt(at.GetCharsCount() - 1).GetGlyph().GetWidth()
+			var y = (len(s.cursorHelper) - 1) * s.face.GetSize()
+			engine.LogDebug("cap=%v", x)
+			pos := s.cursor.Transform.Position
+			s.cursor.SetPositionXy(pos.X + float32(x), pos.Y + float32(y))
+		}
 	}
 }
 
@@ -59,6 +62,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			engine.LogDebug("widdddddddth: %+v", s.cursorHelper[0])
 			pressedKey := keyDownEvent.StringData()
 			engine.LogDebug(pressedKey)
+			engine.LogDebug(string(s.text))
 			s.text = append(s.text, []rune(pressedKey)...)
 			s.textView.SetText(string(s.text))
 			for i := 0; i < len(s.text); i++ {
@@ -77,6 +81,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 		if keyDownEvent.Data != nil {
 			s.cursorHelper = regregexp.MustCompile("[\n]").Split(string(s.text), -1)
 			pressedKey := keyDownEvent.StringData()
+
 			if len(s.text) > 0 && pressedKey == "Backspace" {
 				s.text = s.text[:len(s.text) - 1]
 				s.textView.SetText(string(s.text))
@@ -84,14 +89,16 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 				s.text = append(s.text, '\n')
 				s.textView.SetText(string(s.text))
 			}
-			s.CursorUpdate
+			s.CursorUpdate()
 		}
 		return true
 	})
 
 }
 
+func (s *InputField) OnStart() {
 
+}
 
 func (s *InputField) OnUpdate(ctx engine.UpdateContext) {
 
