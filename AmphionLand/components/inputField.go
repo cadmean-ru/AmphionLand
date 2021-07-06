@@ -5,7 +5,7 @@ import (
 	"github.com/cadmean-ru/amphion/common/atext"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
-	"strings"
+	//"strings"
 )
 
 type InputField struct {
@@ -14,19 +14,29 @@ type InputField struct {
 	face *atext.Face
 	textView *builtin.TextView
 	text []rune
-	cursor *engine.SceneObject
+	cursor Cursor
+	lineCount int
+	//cursorHelper []string
+}
+
+type Cursor struct {
+	index int
+	cursorObj *engine.SceneObject
 }
 
 func (s *InputField) CursorUpdate() {
-			if len(s.text) != 0 {
-				at := atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetRect(), atext.LayoutOptions{})
-				char := at.GetCharAt(at.GetCharsCount() - 1)
-				var x = char.GetX() + char.GetGlyph().GetWidth()
-				var y = char.GetY()
-				s.cursor.SetPositionXy(float32(x), float32(y))
-			}
+	if len(s.text) != 0 {
+		at := atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetRect(), atext.LayoutOptions{})
+		if s.lineCount != at.GetLinesCount(){
+			s.lineCount ++
+			s.cursor.index = -1
 		}
-
+		char := at.GetCharAt(s.cursor.index)
+		var x = char.GetX() + char.GetGlyph().GetWidth()
+		var y = char.GetY()
+		s.cursor.cursorObj.SetPositionXy(float32(x), float32(y))
+	}
+}
 
 func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
@@ -37,17 +47,22 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.face = s.font.NewFace(int(s.textView.FontSize))
 	s.SceneObject.AddComponent(builtin.NewBoundaryView())
 
-	s.cursor = engine.NewSceneObject("BIG CURSOR")
-	s.cursor.Transform.Size = a.NewVector3(1, float32(s.textView.FontSize), 0)
+	s.cursor.index = -1
+	cursorObj :=engine.NewSceneObject("BIG CURSOR")
+	cursorObj.Transform.Size = a.NewVector3(1, float32(s.textView.FontSize), 0)
 	cursorRect := builtin.NewShapeView(builtin.ShapeRectangle)
 	cursorRect.FillColor = a.NewColor("#000000")
-	s.cursor.AddComponent(cursorRect)
-	s.SceneObject.AddChild(s.cursor)
+	cursorObj.AddComponent(cursorRect)
+	s.SceneObject.AddChild(cursorObj)
 
-	s.cursor.SetEnabled(false)
+	cursorObj.SetEnabled(false)
+
+	s.cursor.cursorObj = cursorObj
+
+	s.lineCount = 0
 
 	s.Engine.BindEventHandler(engine.EventTextInput, func(keyDownEvent engine.AmphionEvent) bool {
-		s.cursor.SetEnabled(true)
+		s.cursor.cursorObj.SetEnabled(true)
 		if !s.textView.SceneObject.IsFocused() {
 			return true
 		}
@@ -55,6 +70,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			pressedKey := keyDownEvent.StringData()
 			s.text = append(s.text, []rune(pressedKey)...)
 			s.textView.SetText(string(s.text))
+			s.cursor.index += 1
 			s.CursorUpdate()
 		}
 		return true
@@ -65,22 +81,55 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			return true
 		}
 		if keyDownEvent.Data != nil {
-			pressedKey := keyDownEvent.StringData()
 
-			if len(s.text) > 0 && pressedKey == "Backspace" {
-				s.text = s.text[:len(s.text) - 1]
-				s.textView.SetText(string(s.text))
-			} else if strings.HasPrefix(pressedKey, "Enter") {
+			pressedKey := keyDownEvent.StringData()
+			engine.LogDebug(pressedKey)
+			switch prefix:= pressedKey; prefix {
+			case "Backspace":
+				if len(s.text) > 0 {
+					s.text = s.text[:len(s.text) - 1]
+					s.textView.SetText(string(s.text))
+					s.cursor.index -= 1
+				}
+			case "Enter": {
 				s.text = append(s.text, '\n')
 				s.textView.SetText(string(s.text))
-			} else {
+				s.cursor.index = -1
+				s.lineCount += 1
+				//s.cursorHelper = regregexp.MustCompile("[\n]").Split(string(s.text), -1)
+				}
+			case "LeftArrow":{
+				if s.cursor.index > 0 {
+					s.cursor.index -= 1
+					s.CursorUpdate()
+				}
+			}
+			case "RightArrow":
+				if s.cursor.index != len(s.text) - 1 {
+					s.cursor.index += 1
+					s.CursorUpdate()
+				}
+			case "UpArrow":
+				return true
+			case "DownArrow":
+				return true
+			default:
 				return true
 			}
+
+			//if len(s.text) > 0 && strings.HasPrefix(pressedKey, "Backspace") {
+			//	s.text = s.text[:len(s.text) - 1]
+			//	s.textView.SetText(string(s.text))
+			//} else if strings.HasPrefix(pressedKey, "Enter") {
+			//	s.text = append(s.text, '\n')
+			//	s.textView.SetText(string(s.text))
+			//} else {
+			//	return true
+			//}
 			s.CursorUpdate()
 		}
 		return true
 	})
-
 }
 
 func (s *InputField) OnStart() {
