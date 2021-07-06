@@ -5,7 +5,6 @@ import (
 	"github.com/cadmean-ru/amphion/common/atext"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
-	//"strings"
 )
 
 type InputField struct {
@@ -16,26 +15,69 @@ type InputField struct {
 	text []rune
 	cursor Cursor
 	lineCount int
-	//cursorHelper []string
+	at *atext.Text
 }
 
 type Cursor struct {
-	index int
+	indexChar int
+	indexLine int
 	cursorObj *engine.SceneObject
 }
 
 func (s *InputField) CursorUpdate() {
 	if len(s.text) != 0 {
-		at := atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetRect(), atext.LayoutOptions{})
-		if s.lineCount != at.GetLinesCount(){
-			s.lineCount ++
-			s.cursor.index = -1
+		s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetRect(), atext.LayoutOptions{})
+
+		if s.lineCount < s.at.GetLinesCount() { // перенос курсора на другую строчку, если он в самом конце
+			s.lineCount++
+			if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 {
+				s.cursor.indexChar = 0
+				s.cursor.indexLine += 1
+			}
+		} else if s.lineCount > s.at.GetLinesCount() {
+			s.lineCount--
+			if s.cursor.indexChar < 0 && s.cursor.indexLine > 0 {
+				s.cursor.indexLine -= 1
+				s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
+			}
 		}
-		char := at.GetCharAt(s.cursor.index)
-		var x = char.GetX() + char.GetGlyph().GetWidth()
-		var y = char.GetY()
-		s.cursor.cursorObj.SetPositionXy(float32(x), float32(y))
+
+		if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 { // перенос курсора на другую строчку, если он не в самом конце
+			s.cursor.indexChar = 0
+			s.cursor.indexLine += 1
+		} else if s.cursor.indexChar < -1 && s.cursor.indexLine > 0 {
+			s.cursor.indexLine -= 1
+			s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
+		}
+
+		if s.cursor.indexChar > -1 { // новые координаты курсора по индексам
+			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
+			var x = char.GetX() + char.GetGlyph().GetWidth()
+			var y = char.GetY()
+			s.cursor.cursorObj.SetPositionXy(float32(x), float32(y))
+		} else {
+			char := s.at.GetCharAt(s.GetIndexInText(s.cursor) + 1)
+			if char != nil {
+				var x = char.GetX()
+				var y = char.GetY()
+				s.cursor.cursorObj.SetPositionXy(float32(x), float32(y))
+			}
+		}
+		engine.LogDebug("l=%v c=%v", s.cursor.indexLine, s.cursor.indexChar)
 	}
+}
+
+func (s *InputField) GetIndexInText(cursor Cursor) int {
+	index := 0
+	for i := 0; i < s.lineCount; i++ {
+		if i < cursor.indexLine {
+			index += s.at.GetLineAt(i).GetCharsCount()
+		} else {
+			index += cursor.indexChar
+			return index
+		}
+	}
+	return -1
 }
 
 func (s *InputField) OnInit(ctx engine.InitContext) {
@@ -47,7 +89,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.face = s.font.NewFace(int(s.textView.FontSize))
 	s.SceneObject.AddComponent(builtin.NewBoundaryView())
 
-	s.cursor.index = -1
+	s.cursor.indexChar = -1
 	cursorObj :=engine.NewSceneObject("BIG CURSOR")
 	cursorObj.Transform.Size = a.NewVector3(1, float32(s.textView.FontSize), 0)
 	cursorRect := builtin.NewShapeView(builtin.ShapeRectangle)
@@ -59,7 +101,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 
 	s.cursor.cursorObj = cursorObj
 
-	s.lineCount = 0
+	s.lineCount = 1
 
 	s.Engine.BindEventHandler(engine.EventTextInput, func(keyDownEvent engine.AmphionEvent) bool {
 		s.cursor.cursorObj.SetEnabled(true)
@@ -68,9 +110,16 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 		}
 		if keyDownEvent.Data != nil {
 			pressedKey := keyDownEvent.StringData()
-			s.text = append(s.text, []rune(pressedKey)...)
+
+			textCopy := make([]rune, len(s.text))
+			copy(textCopy, s.text)
+			head := textCopy[:s.GetIndexInText(s.cursor) + 1]
+			tail := s.text[s.GetIndexInText(s.cursor) + 1:]
+			head = append(head, []rune(pressedKey)...)
+			s.text = append(head, tail...)
+
 			s.textView.SetText(string(s.text))
-			s.cursor.index += 1
+			s.cursor.indexChar += 1
 			s.CursorUpdate()
 		}
 		return true
@@ -86,33 +135,71 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			engine.LogDebug(pressedKey)
 			switch prefix:= pressedKey; prefix {
 			case "Backspace":
-				if len(s.text) > 0 {
-					s.text = s.text[:len(s.text) - 1]
+				if len(s.text) > 0 && s.GetIndexInText(s.cursor) > -1 {
+					textCopy := make([]rune, len(s.text))
+					copy(textCopy, s.text)
+					head := textCopy[:s.GetIndexInText(s.cursor) + 1]
+					tail := s.text[s.GetIndexInText(s.cursor) + 1:]
+					head = head[:len(head) - 1]
+					s.text = append(head, tail...)
+
 					s.textView.SetText(string(s.text))
-					s.cursor.index -= 1
+
+					if s.cursor.indexChar == -1 {
+						s.cursor.indexLine--
+						s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
+					} else {
+						s.cursor.indexChar -= 1
+					}
+					s.CursorUpdate()
 				}
 			case "Enter": {
 				s.text = append(s.text, '\n')
 				s.textView.SetText(string(s.text))
-				s.cursor.index = -1
 				s.lineCount += 1
-				//s.cursorHelper = regregexp.MustCompile("[\n]").Split(string(s.text), -1)
+				s.cursor.indexChar = -1
+				s.cursor.indexLine += 1
+				// s.cursorHelper = regregexp.MustCompile("[\n]").Split(string(s.text), -1)
 				}
 			case "LeftArrow":{
-				if s.cursor.index > 0 {
-					s.cursor.index -= 1
+				if s.GetIndexInText(s.cursor) >= 0 {
+					if s.cursor.indexChar == -1 {
+						s.cursor.indexLine--
+						s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
+					} else {
+						s.cursor.indexChar -= 1
+					}
 					s.CursorUpdate()
 				}
 			}
 			case "RightArrow":
-				if s.cursor.index != len(s.text) - 1 {
-					s.cursor.index += 1
+				if s.GetIndexInText(s.cursor) != len(s.text) - 1 {
+					if s.cursor.indexChar == s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 {
+						s.cursor.indexLine++
+						s.cursor.indexChar = -1
+					} else {
+						s.cursor.indexChar += 1
+					}
 					s.CursorUpdate()
 				}
 			case "UpArrow":
-				return true
+				if s.cursor.indexLine > 0 {
+					//if s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() > s.at.GetLineAt(s.cursor.indexLine - 1).GetCharsCount() {
+					if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine - 1).GetCharsCount() - 1 {
+						s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine - 1).GetCharsCount() - 1
+					}
+					s.cursor.indexLine--
+					s.CursorUpdate()
+				}
 			case "DownArrow":
-				return true
+				if s.cursor.indexLine < s.at.GetLinesCount() - 1 {
+					//if s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() > s.at.GetLineAt(s.cursor.indexLine + 1).GetCharsCount() {
+					if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine + 1).GetCharsCount() - 1 {
+						s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine + 1).GetCharsCount() - 1
+					}
+					s.cursor.indexLine++
+					s.CursorUpdate()
+				}
 			default:
 				return true
 			}
