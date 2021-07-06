@@ -1,12 +1,10 @@
 package components
 
 import (
-	"fmt"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/common/atext"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
-	regregexp "regexp"
 	"strings"
 )
 
@@ -17,21 +15,18 @@ type InputField struct {
 	textView *builtin.TextView
 	text []rune
 	cursor *engine.SceneObject
-	cursorHelper []string
 }
 
 func (s *InputField) CursorUpdate() {
-	if s.cursorHelper != nil {
-		if s.text != nil {
-			at := atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
-			var x = at.GetCharAt(at.GetCharsCount() - 1).GetGlyph().GetWidth()
-			var y = (len(s.cursorHelper) - 1) * s.face.GetSize()
-			engine.LogDebug("cap=%v", x)
-			pos := s.cursor.Transform.Position
-			s.cursor.SetPositionXy(pos.X + float32(x), pos.Y + float32(y))
+			if len(s.text) != 0 {
+				at := atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetRect(), atext.LayoutOptions{})
+				char := at.GetCharAt(at.GetCharsCount() - 1)
+				var x = char.GetX() + char.GetGlyph().GetWidth()
+				var y = char.GetY()
+				s.cursor.SetPositionXy(float32(x), float32(y))
+			}
 		}
-	}
-}
+
 
 func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
@@ -53,23 +48,14 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 
 	s.Engine.BindEventHandler(engine.EventTextInput, func(keyDownEvent engine.AmphionEvent) bool {
 		s.cursor.SetEnabled(true)
-		engine.LogDebug(fmt.Sprintf("key: %+v", keyDownEvent.Data))
 		if !s.textView.SceneObject.IsFocused() {
 			return true
 		}
 		if keyDownEvent.Data != nil {
-			s.cursorHelper = regregexp.MustCompile("[\n]").Split(string(s.text), -1)
-			engine.LogDebug("widdddddddth: %+v", s.cursorHelper[0])
 			pressedKey := keyDownEvent.StringData()
-			engine.LogDebug(pressedKey)
-			engine.LogDebug(string(s.text))
 			s.text = append(s.text, []rune(pressedKey)...)
 			s.textView.SetText(string(s.text))
-			for i := 0; i < len(s.text); i++ {
-				engine.LogDebug(string(s.text[i]))
-			}
 			s.CursorUpdate()
-			//s.cursor.SetPositionXy(GetTextWidth(bruh[len(bruh) - 1]) + 10, float32(s.textView.FontSize) * float32(len(strings.Split(string(s.text), "\n")) - 1))
 		}
 		return true
 	})
@@ -79,7 +65,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			return true
 		}
 		if keyDownEvent.Data != nil {
-			s.cursorHelper = regregexp.MustCompile("[\n]").Split(string(s.text), -1)
 			pressedKey := keyDownEvent.StringData()
 
 			if len(s.text) > 0 && pressedKey == "Backspace" {
@@ -88,6 +73,8 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			} else if strings.HasPrefix(pressedKey, "Enter") {
 				s.text = append(s.text, '\n')
 				s.textView.SetText(string(s.text))
+			} else {
+				return true
 			}
 			s.CursorUpdate()
 		}
@@ -106,9 +93,4 @@ func (s *InputField) OnUpdate(ctx engine.UpdateContext) {
 
 func (s *InputField) GetName() string {
 	return engine.NameOfComponent(s)
-}
-
-func GetTextWidth(text string) float32 {
-	//return float32(js.Global().Get("textWidth").Invoke(text).Float())
-	return 0
 }
