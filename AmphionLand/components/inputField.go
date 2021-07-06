@@ -159,7 +159,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 				s.lineCount += 1
 				s.cursor.indexChar = -1
 				s.cursor.indexLine += 1
-				// s.cursorHelper = regregexp.MustCompile("[\n]").Split(string(s.text), -1)
 				}
 			case "LeftArrow":{
 				if s.GetIndexInText(s.cursor) >= 0 {
@@ -184,7 +183,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 				}
 			case "UpArrow":
 				if s.cursor.indexLine > 0 {
-					//if s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() > s.at.GetLineAt(s.cursor.indexLine - 1).GetCharsCount() {
 					if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine - 1).GetCharsCount() - 1 {
 						s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine - 1).GetCharsCount() - 1
 					}
@@ -193,7 +191,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 				}
 			case "DownArrow":
 				if s.cursor.indexLine < s.at.GetLinesCount() - 1 {
-					//if s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() > s.at.GetLineAt(s.cursor.indexLine + 1).GetCharsCount() {
 					if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine + 1).GetCharsCount() - 1 {
 						s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine + 1).GetCharsCount() - 1
 					}
@@ -203,16 +200,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			default:
 				return true
 			}
-
-			//if len(s.text) > 0 && strings.HasPrefix(pressedKey, "Backspace") {
-			//	s.text = s.text[:len(s.text) - 1]
-			//	s.textView.SetText(string(s.text))
-			//} else if strings.HasPrefix(pressedKey, "Enter") {
-			//	s.text = append(s.text, '\n')
-			//	s.textView.SetText(string(s.text))
-			//} else {
-			//	return true
-			//}
 			s.CursorUpdate()
 		}
 		return true
