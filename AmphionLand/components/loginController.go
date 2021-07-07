@@ -2,6 +2,7 @@ package components
 
 import (
 	"AmphionLand/generated/res"
+	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 )
@@ -63,8 +64,9 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	bigGridObj := engine.NewSceneObject("bigGrid")
 	bigGridObj.AddComponent(builtin.NewGridLayout())
 	bigGrid := bigGridObj.GetComponentByName("GridLayout", true).(*builtin.GridLayout)
-	bigGrid.Cols = 3
-	bigGrid.Rows = 3
+	bigGrid.AddColumn(a.FillParent)
+	//bigGrid.Cols = 3
+	//bigGrid.Rows = 3
 	//bigGrid.RowPadding = 10
 	//bigGrid.ColPadding = 10
 
@@ -118,12 +120,12 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 
 func (l *LoginSceneController) OnStart() {
 	engine.LogDebug("OnStart 2")
-	//paddingComponent := l.paddingObject.FindComponentByName("Padding", true).(*Padding)
-	//paddingComponent.LeftX = 100
-	//paddingComponent.UpY = 100
-	//paddingComponent.DownY = 50
-	//paddingComponent.RightX = 25
-	//paddingComponent.UpdatePadding()
+	paddingComponent := l.paddingObject.FindComponentByName("Padding", true).(*Padding)
+	paddingComponent.LeftX = 100
+	paddingComponent.UpY = 100
+	paddingComponent.DownY = 50
+	paddingComponent.RightX = 25
+	paddingComponent.UpdatePadding()
 }
 
 func (l *LoginSceneController) GetName() string {

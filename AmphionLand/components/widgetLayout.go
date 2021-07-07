@@ -16,8 +16,10 @@ type WidgetGrid struct {
 func (s *WidgetGrid) OnInit(ctx engine.InitContext) {
 	s.GridLayout.OnInit(ctx)
 	s.Size = 5
-	s.Cols = s.Size
-	s.Rows = s.Size
+	for i := 0; i < s.Size; i++ {
+		s.AddColumn(a.WrapContent)
+		s.AddRow(a.WrapContent)
+	}
 
 	//engine.LogDebug("Here %+v\n\n\n", s.Size)
 

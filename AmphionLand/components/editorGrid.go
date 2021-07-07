@@ -18,7 +18,7 @@ func (s *EditorGrid) OnStart() {
 	s.grid = s.SceneObject.GetComponentByName("GridLayout").(*builtin.GridLayout)
 	s.editor = engine.FindComponentByName("EditorController").(*EditorController)
 
-	for i := 0; i < s.grid.Rows * s.grid.Cols; i++ {
+	for i := 0; i < s.grid.GetRowsCount() * s.grid.GetColumnsCount(); i++ {
 		s.SceneObject.AddChild(s.makeBox(i, false))
 	}
 }
@@ -30,7 +30,7 @@ func (s *EditorGrid) MakeClickable() {
 }
 
 func (s *EditorGrid) AdjustSize(x, y int) {
-	currentSize := s.grid.Cols * s.grid.Rows
+	currentSize := s.grid.GetColumnsCount() * s.grid.GetRowsCount()
 	newSize := x * y
 	diff := int(math.Abs(float64(newSize - currentSize)))
 

@@ -137,8 +137,11 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		box := engine.NewSceneObject(fmt.Sprintf("emptyBox %d", i))
 		box.Transform.Size.Y = 90
 		grid := builtin.NewGridLayout()
-		grid.Cols = 2
-		grid.Rows = 3
+		grid.AddColumn(a.WrapContent)
+		grid.AddColumn(a.WrapContent)
+		grid.AddRow(a.WrapContent)
+		grid.AddRow(a.WrapContent)
+		grid.AddRow(a.WrapContent)
 
 		box.AddComponent(grid)
 
@@ -180,7 +183,8 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		publics := cm.GetComponentState(comp)
 		componentsSomething.Transform.Size.Y = float32(30 * (len(publics) + 1))
 		grid := builtin.NewGridLayout()
-		grid.Cols = 2
+		grid.AddColumn(a.WrapContent)
+		grid.AddColumn(a.WrapContent)
 
 		componentsSomething.AddComponent(grid)
 

@@ -78,7 +78,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.SceneObject.AddComponent(builtin.NewBoundaryView())
 
 	s.cursor.indexChar = -1
-	cursorObj :=engine.NewSceneObject("BIG CURSOR")
+	cursorObj := engine.NewSceneObject("BIG CURSOR")
 	cursorObj.Transform.Size = a.NewVector3(1, float32(s.textView.FontSize), 0)
 	cursorRect := builtin.NewShapeView(builtin.ShapeRectangle)
 	cursorRect.FillColor = a.NewColor("#000000")
@@ -192,10 +192,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 }
 
 func (s *InputField) OnStart() {
-
-}
-
-func (s *InputField) OnUpdate(ctx engine.UpdateContext) {
 
 }
 

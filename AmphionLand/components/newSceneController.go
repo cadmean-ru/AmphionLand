@@ -1,7 +1,7 @@
 package components
 
 import (
-	"AmphionLand/generated/res"
+	"AmphionLand/res"
 	"github.com/cadmean-ru/amphion/engine"
 )
 

@@ -30,7 +30,7 @@ type RadioButtonGroup struct {
 
 func (s *RadioButtonGroup) OnInit(ctx engine.InitContext) {
 	s.GridLayout.OnInit(ctx)
-	s.Cols = 1
+	s.AddColumn(a.WrapContent)
 
 	s.initialized = true
 }
