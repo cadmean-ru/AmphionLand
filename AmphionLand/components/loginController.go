@@ -62,9 +62,10 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	//l.SceneObject.AddChild(butt)
 
 	bigGridObj := engine.NewSceneObject("bigGrid")
-	bigGridObj.AddComponent(builtin.NewGridLayout())
-	bigGrid := bigGridObj.GetComponentByName("GridLayout", true).(*builtin.GridLayout)
-	bigGrid.AddColumn(a.FillParent)
+
+	bigGrid := builtin.NewGridLayoutSized(1, 2)
+
+	bigGridObj.AddComponent(bigGrid)
 	//bigGrid.Cols = 3
 	//bigGrid.Rows = 3
 	//bigGrid.RowPadding = 10
@@ -77,6 +78,7 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	//bigGridObj.AddChild(butt3)
 
 	paddingObject2 := engine.NewSceneObject("padding2")
+	paddingObject2.Transform.Size = a.Vector3{X: 100, Y:100, Z:10}
 	paddingObject2.AddComponent(NewPadding())
 	paddingObject2.AddComponent(builtin.NewBoundaryView())
 	paddingObject2.AddChild(butt3)
@@ -88,8 +90,9 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	//	return true
 	//}))
 	butt2.FindComponentByName("TextView", true).(*builtin.TextView).SetText("butt2")
-	//l.paddingObject.AddChild(butt2)
+	//bigGridObj.AddChild(butt2)
 	l.paddingObject = engine.NewSceneObject("padding")
+	l.paddingObject.Transform.Size = a.Vector3{X: 100, Y:100, Z:10}
 	l.paddingObject.AddComponent(NewPadding())
 	l.paddingObject.AddComponent(builtin.NewBoundaryView())
 	l.paddingObject.AddChild(butt2)
