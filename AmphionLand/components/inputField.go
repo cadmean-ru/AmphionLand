@@ -14,7 +14,6 @@ type InputField struct {
 	textView *builtin.TextView
 	text []rune
 	cursor Cursor
-	lineCount int
 	at *atext.Text
 }
 
@@ -28,27 +27,13 @@ func (s *InputField) CursorUpdate() {
 	if len(s.text) != 0 {
 		s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetRect(), atext.LayoutOptions{})
 
-		if s.lineCount < s.at.GetLinesCount() { // перенос курсора на другую строчку, если он в самом конце
-			s.lineCount++
-			if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 {
-				s.cursor.indexChar = 0
-				s.cursor.indexLine += 1
-			}
-		} else if s.lineCount > s.at.GetLinesCount() {
-			s.lineCount--
-			if s.cursor.indexChar < 0 && s.cursor.indexLine > 0 {
-				s.cursor.indexLine -= 1
-				s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
-			}
-		}
-
-		if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 { // перенос курсора на другую строчку, если он не в самом конце
-			s.cursor.indexChar = 0
-			s.cursor.indexLine += 1
-		} else if s.cursor.indexChar < -1 && s.cursor.indexLine > 0 {
-			s.cursor.indexLine -= 1
+		if s.cursor.indexChar < -1 && s.cursor.indexLine > 0 {
+			s.cursor.indexLine--
 			s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
-		}
+		} else if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 { // перенос курсора на другую строчку
+			s.cursor.indexChar = 0
+			s.cursor.indexLine++
+		} else
 
 		if s.cursor.indexChar > -1 { // новые координаты курсора по индексам
 			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
@@ -69,7 +54,10 @@ func (s *InputField) CursorUpdate() {
 
 func (s *InputField) GetIndexInText(cursor Cursor) int {
 	index := 0
-	for i := 0; i < s.lineCount; i++ {
+	if s.at == nil {
+		return -1
+	}
+	for i := 0; i < s.at.GetLinesCount(); i++ {
 		if i < cursor.indexLine {
 			index += s.at.GetLineAt(i).GetCharsCount()
 		} else {
@@ -90,7 +78,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.SceneObject.AddComponent(builtin.NewBoundaryView())
 
 	s.cursor.indexChar = -1
-	cursorObj :=engine.NewSceneObject("BIG CURSOR")
+	cursorObj := engine.NewSceneObject("BIG CURSOR")
 	cursorObj.Transform.Size = a.NewVector3(1, float32(s.textView.FontSize), 0)
 	cursorRect := builtin.NewShapeView(builtin.ShapeRectangle)
 	cursorRect.FillColor = a.NewColor("#000000")
@@ -100,8 +88,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	cursorObj.SetEnabled(false)
 
 	s.cursor.cursorObj = cursorObj
-
-	s.lineCount = 1
 
 	s.Engine.BindEventHandler(engine.EventTextInput, func(keyDownEvent engine.AmphionEvent) bool {
 		s.cursor.cursorObj.SetEnabled(true)
@@ -119,7 +105,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			s.text = append(head, tail...)
 
 			s.textView.SetText(string(s.text))
-			s.cursor.indexChar += 1
+			s.cursor.indexChar++
 			s.CursorUpdate()
 		}
 		return true
@@ -145,20 +131,19 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 
 					s.textView.SetText(string(s.text))
 
-					if s.cursor.indexChar == -1 {
+					if s.cursor.indexChar == -1 || (s.cursor.indexChar == 0 && s.cursor.indexLine > 0) {
 						s.cursor.indexLine--
 						s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
 					} else {
-						s.cursor.indexChar -= 1
+						s.cursor.indexChar--
 					}
 					s.CursorUpdate()
 				}
 			case "Enter": {
 				s.text = append(s.text, '\n')
 				s.textView.SetText(string(s.text))
-				s.lineCount += 1
 				s.cursor.indexChar = -1
-				s.cursor.indexLine += 1
+				s.cursor.indexLine++
 				}
 			case "LeftArrow":{
 				if s.GetIndexInText(s.cursor) >= 0 {
@@ -166,7 +151,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 						s.cursor.indexLine--
 						s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
 					} else {
-						s.cursor.indexChar -= 1
+						s.cursor.indexChar--
 					}
 					s.CursorUpdate()
 				}
@@ -177,7 +162,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 						s.cursor.indexLine++
 						s.cursor.indexChar = -1
 					} else {
-						s.cursor.indexChar += 1
+						s.cursor.indexChar++
 					}
 					s.CursorUpdate()
 				}
@@ -207,10 +192,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 }
 
 func (s *InputField) OnStart() {
-
-}
-
-func (s *InputField) OnUpdate(ctx engine.UpdateContext) {
 
 }
 

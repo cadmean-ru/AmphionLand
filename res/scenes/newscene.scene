@@ -5,7 +5,7 @@ components:
   - name: AmphionLand/components.NewSceneController
     state: { }
 id: 0
-name: Login
+name: NewScene
 transform:
   pivot:
     x: 0

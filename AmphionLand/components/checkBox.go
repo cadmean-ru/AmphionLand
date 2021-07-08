@@ -30,7 +30,7 @@ type CheckBoxGroup struct {
 
 func (s *CheckBoxGroup) OnInit(ctx engine.InitContext) {
 	s.GridLayout.OnInit(ctx)
-	s.Cols = 1
+	s.AddColumn(a.WrapContent)
 
 	s.initialized = true
 }

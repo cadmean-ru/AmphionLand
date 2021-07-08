@@ -72,7 +72,8 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	rightThing := engine.NewSceneObject("right_thing")
 	rightThing.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
 	layout := builtin.NewGridLayout()
-	layout.Cols = 2
+	layout.AddColumn(a.WrapContent)
+	layout.AddColumn(a.WrapContent)
 	layout.RowPadding = 20
 	rightThing.AddComponent(layout)
 
