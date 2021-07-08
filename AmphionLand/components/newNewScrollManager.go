@@ -12,13 +12,15 @@ type ScrollDirection byte
 const (
 	ScrollUp ScrollDirection = iota
 	ScrollDown
+	ScrollRight
+	ScrollLeft
 	ScrollNone
 )
 
 type NewNewScrollManager struct {
 	engine.ComponentImpl
-	dScrollY         float32
-	scrollDirectionY ScrollDirection
+	dScrollY, dScrollX float32
+	scrollDirectionY, scrollDirectionX ScrollDirection
 }
 
 func (s *NewNewScrollManager) OnStart() {
@@ -44,14 +46,23 @@ func (s *NewNewScrollManager) handleScroll(event engine.AmphionEvent) bool {
 		s.scrollDirectionY = ScrollNone
 	}
 
+	if scrollAmount.X > 0 {
+		s.scrollDirectionX = ScrollRight
+	} else if scrollAmount.X < 0 {
+		s.scrollDirectionX = ScrollLeft
+	} else {
+		s.scrollDirectionX = ScrollNone
+	}
+
 	s.dScrollY = scrollAmount.Y
+	s.dScrollX = scrollAmount.X
 
 	var realArea = s.measureChildren()
 	var sceneRect = engine.GetCurrentScene().Transform.GetRect()
 
 	//engine.LogDebug("%+v", realArea)
 
-	var theScrolly float32
+	var theScrolly, theScrollx float32
 
 	if s.scrollDirectionY == ScrollUp {
 		if realArea.GetMin().Y < 0 {
@@ -69,6 +80,22 @@ func (s *NewNewScrollManager) handleScroll(event engine.AmphionEvent) bool {
 		}
 	}
 
+	if s.scrollDirectionX == ScrollLeft {
+		if realArea.GetMin().X < 0 {
+			mouseScroll := float64(s.dScrollX)
+			areaOffset := float64(realArea.GetMin().X)
+			//engine.LogDebug("%f %f", mouseScroll, areaOffset)
+			theScrollx = float32(math.Max(mouseScroll, areaOffset))
+		}
+	} else if s.scrollDirectionX == ScrollRight {
+		if realArea.GetMax().X > sceneRect.X.GetLength() {
+			mouseScroll := float64(s.dScrollX)
+			areaOffset := float64(realArea.GetMax().X - sceneRect.X.GetLength())
+			//engine.LogDebug("%f %f %f", mouseScroll, areaOffset, sceneRect.Y.GetLength())
+			theScrollx = float32(math.Min(mouseScroll, areaOffset))
+		}
+	}
+
 	//engine.LogDebug("Scrolling %d %f", s.scrollDirectionY, theScrolly)
 
 	if s.scrollDirectionY != ScrollNone {
@@ -80,7 +107,16 @@ func (s *NewNewScrollManager) handleScroll(event engine.AmphionEvent) bool {
 		s.SceneObject.Redraw()
 	}
 
-	s.scrollDirectionY = ScrollNone
+	if s.scrollDirectionX != ScrollNone {
+		s.SceneObject.Transform.Position = s.SceneObject.Transform.Position.Sub(a.NewVector3(theScrollx, 0, 0))
+
+		s.SceneObject.ForEachObject(func(object *engine.SceneObject) {
+			object.Redraw()
+		})
+		s.SceneObject.Redraw()
+	}
+
+	s.scrollDirectionY, s.scrollDirectionX = ScrollNone, ScrollNone
 
 	return true
 }
