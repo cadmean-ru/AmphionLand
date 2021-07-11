@@ -4,8 +4,11 @@ components:
     state: {}
   - name: github.com/cadmean-ru/amphion/engine/builtin.GridLayout
     state:
-      rows: 1
-      cols: 2
+      rows:
+        - height: $FillParent
+      columns:
+        - width: $FillParent
+        - width: $FillParent
   - name: github.com/cadmean-ru/amphion/engine/builtin.ShapeView
     state:
       fillColor: "#696969"

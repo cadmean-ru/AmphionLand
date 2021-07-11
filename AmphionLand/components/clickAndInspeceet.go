@@ -1,6 +1,7 @@
 package components
 
 import (
+	"AmphionLand/generated/res"
 	"fmt"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/engine"
@@ -137,11 +138,11 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		box := engine.NewSceneObject(fmt.Sprintf("emptyBox %d", i))
 		box.Transform.Size.Y = 90
 		grid := builtin.NewGridLayout()
-		grid.AddColumn(a.WrapContent)
-		grid.AddColumn(a.WrapContent)
-		grid.AddRow(a.WrapContent)
-		grid.AddRow(a.WrapContent)
-		grid.AddRow(a.WrapContent)
+		grid.AddColumn(a.FillParent)
+		grid.AddColumn(a.FillParent)
+		grid.AddRow(a.FillParent)
+		grid.AddRow(a.FillParent)
+		grid.AddRow(a.FillParent)
 
 		box.AddComponent(grid)
 
@@ -182,9 +183,10 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 
 		publics := cm.GetComponentState(comp)
 		componentsSomething.Transform.Size.Y = float32(30 * (len(publics) + 1))
+		componentsSomething.AddComponent(builtin.NewBoundaryView())
 		grid := builtin.NewGridLayout()
-		grid.AddColumn(a.WrapContent)
-		grid.AddColumn(a.WrapContent)
+		grid.AddColumn(a.FillParent)
+		grid.AddColumn(a.FillParent)
 
 		componentsSomething.AddComponent(grid)
 
@@ -215,12 +217,8 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			stateLabel.AddComponent(stateLabelText)
 			componentsSomething.AddChild(stateLabel)
 
-			stateInput := engine.NewSceneObject("stateInput" + name)
+			stateInput, _ := engine.LoadPrefab(res.Prefabs_inputBox)
 			stateInput.Transform.Size.Y = 30
-			stateLabelInput := builtin.NewTextView(fmt.Sprintf("%+v", public))
-			stateLabelInput.SetHTextAlign(a.TextAlignRight)
-			stateLabelInput.SetVTextAlign(a.TextAlignCenter)
-			stateInput.AddComponent(stateLabelInput)
 			componentsSomething.AddChild(stateInput)
 
 			switch public.(type) {

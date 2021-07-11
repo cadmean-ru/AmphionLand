@@ -31,7 +31,9 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	view.FillColor = a.NewColor(100, 100, 100)
 	view.StrokeWeight = 0
 	leftScene.AddComponent(view)
-	leftScene.AddComponent(builtin.NewGridLayout())
+	layout := builtin.NewGridLayout()
+	layout.AddColumn(a.FillParent)
+	leftScene.AddComponent(layout)
 
 	engine.BindEventHandler(engine.EventKeyDown, func(event engine.AmphionEvent) bool {
 		engine.LogDebug("key pressed: %s", event.StringData())
@@ -71,11 +73,11 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 
 	rightThing := engine.NewSceneObject("right_thing")
 	rightThing.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,0)
-	layout := builtin.NewGridLayout()
-	layout.AddColumn(a.WrapContent)
-	layout.AddColumn(a.WrapContent)
-	layout.RowPadding = 20
-	rightThing.AddComponent(layout)
+	layoutRight := builtin.NewGridLayout()
+	layoutRight.AddColumn(a.FillParent)
+	layoutRight.AddColumn(a.FillParent)
+	layoutRight.RowPadding = 3
+	rightThing.AddComponent(layoutRight)
 
 	playButton, err := engine.LoadPrefab(res.Prefabs_button)
 
@@ -185,18 +187,19 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 		rightThing.AddChild(prefabRemove)
 	}
 
-	sceneObject2_3 := engine.NewSceneObject("Prefab List")
-	sceneObject2_3.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
+	sceneobject23 := engine.NewSceneObject("Prefab List")
+	sceneobject23.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
 	view4 := builtin.NewShapeView(builtin.ShapeRectangle)
 	view4.FillColor = a.NewColor(115, 115, 180)
 	view4.StrokeWeight = 1
-	sceneObject2_3.AddComponent(view4)
-	prefabs_layout := builtin.NewGridLayout()
-	prefabs_layout.RowPadding = 10
-	sceneObject2_3.AddComponent(prefabs_layout)
-	rightThing.AddChild(sceneObject2_3)
+	sceneobject23.AddComponent(view4)
+	prefabsLayout := builtin.NewGridLayout()
+	prefabsLayout.AddColumn(a.FillParent)
+	prefabsLayout.RowPadding = 0
+	sceneobject23.AddComponent(prefabsLayout)
+	rightThing.AddChild(sceneobject23)
 
-	s.SpawnPrefabsList(sceneObject2_3)
+	s.SpawnPrefabsList(sceneobject23)
 
 	s.hierarchy = engine.NewSceneObject("Hierarchy")
 	s.hierarchy.Transform.Size = a.NewVector3(a.MatchParent,a.MatchParent,1)
@@ -204,7 +207,9 @@ func (s *EditorController) OnInit(ctx engine.InitContext) {
 	view5.FillColor = a.NewColor(115, 115, 180)
 	view5.StrokeWeight = 1
 	s.hierarchy.AddComponent(view5)
-	s.hierarchy.AddComponent(builtin.NewGridLayout())
+	hierarchyLayout := builtin.NewGridLayout()
+	hierarchyLayout.AddColumn(a.FillParent)
+	s.hierarchy.AddComponent(hierarchyLayout)
 	rightThing.AddChild(s.hierarchy)
 
 	s.SceneObject.AddChild(leftScene)
