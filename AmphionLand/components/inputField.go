@@ -1,6 +1,7 @@
 package components
 
 import (
+	"github.com/atotto/clipboard"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/common/atext"
 	"github.com/cadmean-ru/amphion/engine"
@@ -15,6 +16,7 @@ type InputField struct {
 	text []rune
 	cursor Cursor
 	at *atext.Text
+	buffer string
 }
 
 type Cursor struct {
@@ -38,6 +40,7 @@ func (s *InputField) CursorUpdate() {
 		if s.cursor.indexChar > -1 { // новые координаты курсора по индексам
 			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
 			var x = char.GetX() + char.GetGlyph().GetWidth()
+			engine.LogDebug("%v %v", char.GetGlyph().GetWidth(), char.GetPosition().X)
 			var y = char.GetY()
 			s.cursor.cursorObj.SetPositionXy(float32(x), float32(y))
 		} else {
@@ -68,6 +71,19 @@ func (s *InputField) GetIndexInText(cursor Cursor) int {
 	return -1
 }
 
+func (s *InputField) Input(pressedKey string){
+	textCopy := make([]rune, len(s.text))
+	copy(textCopy, s.text)
+	head := textCopy[:s.GetIndexInText(s.cursor) + 1]
+	tail := s.text[s.GetIndexInText(s.cursor) + 1:]
+	head = append(head, []rune(pressedKey)...)
+	s.text = append(head, tail...)
+
+	s.textView.SetText(string(s.text))
+	s.cursor.indexChar+=len(pressedKey)
+	s.CursorUpdate()
+}
+
 func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
@@ -76,6 +92,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.font, _ = atext.ParseFont(atext.DefaultFontData)
 	s.face = s.font.NewFace(int(s.textView.FontSize))
 	s.SceneObject.AddComponent(builtin.NewBoundaryView())
+	s.buffer = ""
 
 	s.cursor.indexChar = -1
 	cursorObj := engine.NewSceneObject("BIG CURSOR")
@@ -95,22 +112,41 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			return true
 		}
 		if keyDownEvent.Data != nil {
-			pressedKey := keyDownEvent.StringData()
-
-			textCopy := make([]rune, len(s.text))
-			copy(textCopy, s.text)
-			head := textCopy[:s.GetIndexInText(s.cursor) + 1]
-			tail := s.text[s.GetIndexInText(s.cursor) + 1:]
-			head = append(head, []rune(pressedKey)...)
-			s.text = append(head, tail...)
-
-			s.textView.SetText(string(s.text))
-			s.cursor.indexChar++
-			s.CursorUpdate()
+			s.Input(keyDownEvent.StringData())
 		}
 		return true
 	})
-
+	s.Engine.BindEventHandler(engine.EventMouseDown, func(clickEvent engine.AmphionEvent) bool {
+		if !s.textView.SceneObject.IsFocused() {
+			return true
+		}
+		if len(s.text) <= 0{
+			return true
+		}
+		mousePos := clickEvent.MouseEventData().MousePosition
+		for i := 0; i < s.at.GetLinesCount(); i++ {
+			char2 := s.at.GetLineAt(i).GetCharAt(0)
+			lineY := char2.GetY()
+			lineHeight := lineY + char2.GetGlyph().GetHeight()
+			mousePosY :=  mousePos.Y
+			if mousePosY > lineY && mousePosY < lineHeight {
+				for j:=0; j < s.at.GetLineAt(i).GetCharsCount(); j++{
+					mousePosX := mousePos.X
+					char3 := s.at.GetLineAt(i).GetCharAt(j)
+					charPosX := char3.GetX()
+					charWidth := charPosX + char3.GetGlyph().GetWidth()
+					if mousePosX > charPosX && mousePosX < charWidth{
+						s.cursor.indexLine = i
+						s.cursor.indexChar = j
+						s.CursorUpdate()
+						break
+					}
+				}
+				break
+			}
+		}
+		return true
+	})
 	s.Engine.BindEventHandler(engine.EventKeyDown, func(keyDownEvent engine.AmphionEvent) bool {
 		if !s.textView.SceneObject.IsFocused() {
 			return true
@@ -120,6 +156,28 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			pressedKey := keyDownEvent.StringData()
 			engine.LogDebug(pressedKey)
 			switch prefix:= pressedKey; prefix {
+			case "c":
+				if engine.GetInputManager().IsKeyPressed(engine.KeyLeftControl) ||
+					engine.GetInputManager().IsKeyPressed(engine.KeyRightControl) {
+					err := clipboard.WriteAll(string(s.text))
+					if err != nil {
+						engine.LogDebug(err.Error())
+						return true
+					}
+				}
+			case "v":
+				if engine.GetInputManager().IsKeyPressed(engine.KeyLeftControl) ||
+								engine.GetInputManager().IsKeyPressed(engine.KeyRightControl) {
+					var err error
+					s.buffer, err = clipboard.ReadAll()
+					if err!=nil {
+						engine.LogDebug(err.Error())
+						s.buffer = ""
+					} else {
+						s.Input(s.buffer)
+					}
+				}
+
 			case "Backspace":
 				if len(s.text) > 0 && s.GetIndexInText(s.cursor) > -1 {
 					textCopy := make([]rune, len(s.text))
