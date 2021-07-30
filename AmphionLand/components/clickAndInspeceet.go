@@ -4,6 +4,7 @@ import (
 	"AmphionLand/generated/res"
 	"fmt"
 	"github.com/cadmean-ru/amphion/common/a"
+	"github.com/cadmean-ru/amphion/common/require"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 	"strconv"
@@ -207,7 +208,6 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		componentsSomething.AddChild(nameBox)
 
 		s.hierarchy.AddChild(componentsSomething)
-
 		for name, public := range publics {
 			stateLabel := engine.NewSceneObject("stateLabel " + name)
 			stateLabel.Transform.Size.Y = 30
@@ -219,12 +219,19 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 
 			stateInput, _ := engine.LoadPrefab(res.Prefabs_inputBox)
 			stateInput.Transform.Size.Y = 30
-			componentsSomething.AddChild(stateInput)
-
-			switch public.(type) {
-			case string:
-
+			inputField := stateInput.FindComponentByName("InputField", true).(*InputField)
+			inputField.noEnter = true
+			inputField.SetText(require.String(public))
+			inputField.someAction = func() {
+				switch public.(type) {
+				case string:
+					publics[name] = string(inputField.text)
+				}
+				engine.GetInstance().GetComponentsManager().SetComponentState(comp, publics)
+				//engine.ForceAllViewsRedraw()
+				//engine.RequestRendering()
 			}
+			componentsSomething.AddChild(stateInput)
 
 			engine.LogDebug("pub %s %v", name, public)
 		}

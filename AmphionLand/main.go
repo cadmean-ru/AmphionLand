@@ -34,6 +34,7 @@ func registerComponents(cm *engine.ComponentsManager) {
 	cm.RegisterComponentType(&components.Padding{})
 	cm.RegisterComponentType(&components.NewNewScrollManager{})
 	cm.RegisterComponentType(&components.NewSceneController{})
+	cm.RegisterComponentType(&components.Test2{})
 
 	rpc.Initialize("http://localhost:4200")
 }

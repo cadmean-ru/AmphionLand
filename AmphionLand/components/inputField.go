@@ -17,6 +17,8 @@ type InputField struct {
 	cursor Cursor
 	at *atext.Text
 	buffer string
+	noEnter bool
+	someAction func()
 }
 
 type Cursor struct {
@@ -27,8 +29,7 @@ type Cursor struct {
 
 func (s *InputField) CursorUpdate() {
 	if len(s.text) != 0 {
-		s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetRect(), atext.LayoutOptions{})
-
+		s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
 		if s.cursor.indexChar < -1 && s.cursor.indexLine > 0 {
 			s.cursor.indexLine--
 			s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
@@ -40,7 +41,6 @@ func (s *InputField) CursorUpdate() {
 		if s.cursor.indexChar > -1 { // новые координаты курсора по индексам
 			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
 			var x = char.GetX() + char.GetGlyph().GetWidth()
-			engine.LogDebug("%v %v", char.GetGlyph().GetWidth(), char.GetPosition().X)
 			var y = char.GetY()
 			s.cursor.cursorObj.SetPositionXy(float32(x), float32(y))
 		} else {
@@ -71,6 +71,14 @@ func (s *InputField) GetIndexInText(cursor Cursor) int {
 	return -1
 }
 
+
+func (s *InputField) SetText(text string) {
+	//if len(text) == 0 {return}
+	s.text = []rune(text)
+	if s.at == nil {return}
+	s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+}
+
 func (s *InputField) Input(pressedKey string){
 	textCopy := make([]rune, len(s.text))
 	copy(textCopy, s.text)
@@ -87,6 +95,7 @@ func (s *InputField) Input(pressedKey string){
 func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
+	s.noEnter = true
 	s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("TextView", true).(*builtin.TextView)
 
 	s.font, _ = atext.ParseFont(atext.DefaultFontData)
@@ -107,31 +116,35 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.cursor.cursorObj = cursorObj
 
 	s.Engine.BindEventHandler(engine.EventTextInput, func(keyDownEvent engine.AmphionEvent) bool {
-		s.cursor.cursorObj.SetEnabled(true)
 		if !s.textView.SceneObject.IsFocused() {
 			return true
 		}
+		//s.cursor.cursorObj.SetEnabled(true)
 		if keyDownEvent.Data != nil {
 			s.Input(keyDownEvent.StringData())
 		}
 		return true
 	})
+
 	s.Engine.BindEventHandler(engine.EventMouseDown, func(clickEvent engine.AmphionEvent) bool {
 		if !s.textView.SceneObject.IsFocused() {
+			s.cursor.cursorObj.SetEnabled(false)
 			return true
 		}
+		s.cursor.cursorObj.SetEnabled(true)
 		if len(s.text) <= 0{
 			return true
 		}
 		mousePos := clickEvent.MouseEventData().MousePosition
+		mousePosX := mousePos.X
+		mousePosY :=  mousePos.Y
 		for i := 0; i < s.at.GetLinesCount(); i++ {
+			if s.at.GetLineAt(i).GetCharsCount() < 1 {continue}
 			char2 := s.at.GetLineAt(i).GetCharAt(0)
 			lineY := char2.GetY()
 			lineHeight := lineY + char2.GetGlyph().GetHeight()
-			mousePosY :=  mousePos.Y
 			if mousePosY > lineY && mousePosY < lineHeight {
 				for j:=0; j < s.at.GetLineAt(i).GetCharsCount(); j++{
-					mousePosX := mousePos.X
 					char3 := s.at.GetLineAt(i).GetCharAt(j)
 					charPosX := char3.GetX()
 					charWidth := charPosX + char3.GetGlyph().GetWidth()
@@ -145,6 +158,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 				break
 			}
 		}
+		engine.LogDebug("cursor=%v mouse=%v", s.cursor.cursorObj.Transform.Position, mousePos)
 		return true
 	})
 	s.Engine.BindEventHandler(engine.EventKeyDown, func(keyDownEvent engine.AmphionEvent) bool {
@@ -198,10 +212,14 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 					s.CursorUpdate()
 				}
 			case "Enter": {
-				s.text = append(s.text, '\n')
-				s.textView.SetText(string(s.text))
-				s.cursor.indexChar = -1
-				s.cursor.indexLine++
+				if s.noEnter {
+					s.someAction()
+				} else {
+					s.text = append(s.text, '\n')
+					s.textView.SetText(string(s.text))
+					s.cursor.indexChar = -1
+					s.cursor.indexLine++
+				}
 				}
 			case "LeftArrow":{
 				if s.GetIndexInText(s.cursor) >= 0 {
@@ -250,7 +268,10 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 }
 
 func (s *InputField) OnStart() {
-
+	if len(s.text) > 0 {
+		s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+		s.textView.SetText(string(s.text))
+	}
 }
 
 func (s *InputField) GetName() string {

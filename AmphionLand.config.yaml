@@ -3,7 +3,7 @@ author: "Cadmean"
 companyDomain: "cadmean.ru"
 gitUrl: ""
 publicUrl: ""
-mainScene: "newscene"
+mainScene: "editor"
 configurations:
   - name: "Serve web"
     frontend: "web"

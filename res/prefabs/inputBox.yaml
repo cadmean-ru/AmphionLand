@@ -26,7 +26,7 @@ children:
           font: ""
           fontSize: 20
           fontWeight: 0
-          text: "bruh"
+          text: ""
       - name: github.com/cadmean-ru/amphion/engine/builtin.RectBoundary
         state: {}
 #      - name: AmphionLand/components.Zooming
