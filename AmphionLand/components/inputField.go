@@ -79,17 +79,24 @@ func (s *InputField) SetText(text string) {
 	s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
 }
 
-func (s *InputField) Input(pressedKey string){
-	textCopy := make([]rune, len(s.text))
-	copy(textCopy, s.text)
-	head := textCopy[:s.GetIndexInText(s.cursor) + 1]
-	tail := s.text[s.GetIndexInText(s.cursor) + 1:]
-	head = append(head, []rune(pressedKey)...)
-	s.text = append(head, tail...)
+func (s *InputField) Input(inputString string){
+	newatext := atext.LayoutRunes(s.face, []rune(inputString), s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+	width := 0
+	for i := 0; i < newatext.GetCharsCount(); i++ {
+		width += newatext.GetCharAt(i).GetGlyph().GetWidth()
+	}
+	if s.noEnter && float32(s.at.GetLineAt(0).GetSize().X + width) < s.SceneObject.Transform.Size.X{
+		textCopy := make([]rune, len(s.text))
+		copy(textCopy, s.text)
+		head := textCopy[:s.GetIndexInText(s.cursor) + 1]
+		tail := s.text[s.GetIndexInText(s.cursor) + 1:]
+		head = append(head, []rune(inputString)...)
+		s.text = append(head, tail...)
 
-	s.textView.SetText(string(s.text))
-	s.cursor.indexChar+=len(pressedKey)
-	s.CursorUpdate()
+		s.textView.SetText(string(s.text))
+		s.cursor.indexChar+=len(inputString)
+		s.CursorUpdate()
+	}
 }
 
 func (s *InputField) OnInit(ctx engine.InitContext) {
@@ -148,7 +155,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 					char3 := s.at.GetLineAt(i).GetCharAt(j)
 					charPosX := char3.GetX()
 					charWidth := charPosX + char3.GetGlyph().GetWidth()
-					if mousePosX > charPosX && mousePosX < charWidth{
+					if mousePosX >= charPosX && mousePosX < charWidth{
 						s.cursor.indexLine = i
 						s.cursor.indexChar = j
 						s.CursorUpdate()
@@ -158,7 +165,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 				break
 			}
 		}
-		engine.LogDebug("cursor=%v mouse=%v", s.cursor.cursorObj.Transform.Position, mousePos)
+		engine.LogDebug("cursor=%v mouse=%v", s.cursor.cursorObj.Transform.GetGlobalPosition(), mousePos)
 		return true
 	})
 	s.Engine.BindEventHandler(engine.EventKeyDown, func(keyDownEvent engine.AmphionEvent) bool {
@@ -211,6 +218,19 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 					}
 					s.CursorUpdate()
 				}
+			case "Delete":
+				if len(s.text) > 0 && s.GetIndexInText(s.cursor) >= -1 && s.GetIndexInText(s.cursor) < s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 {
+					textCopy := make([]rune, len(s.text))
+					copy(textCopy, s.text)
+					head := textCopy[:s.GetIndexInText(s.cursor) + 1]
+					tail := s.text[s.GetIndexInText(s.cursor) + 1:]
+					tail = tail[1:]
+					s.text = append(head, tail...)
+
+					s.textView.SetText(string(s.text))
+					s.CursorUpdate()
+				}
+
 			case "Enter": {
 				if s.noEnter {
 					s.someAction()

@@ -228,8 +228,9 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 					publics[name] = string(inputField.text)
 				}
 				engine.GetInstance().GetComponentsManager().SetComponentState(comp, publics)
-				//engine.ForceAllViewsRedraw()
-				//engine.RequestRendering()
+
+				engine.ForceAllViewsRedraw()
+				engine.RequestRendering()
 			}
 			componentsSomething.AddChild(stateInput)
 
