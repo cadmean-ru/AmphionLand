@@ -103,7 +103,8 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
 	s.noEnter = true
-	s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("TextView", true).(*builtin.TextView)
+	//s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("TextView", true).(*builtin.TextView)
+	s.textView = builtin.GetTextView(s.SceneObject.GetChildByName("main text"), true)
 
 	s.font, _ = atext.ParseFont(atext.DefaultFontData)
 	s.face = s.font.NewFace(int(s.textView.FontSize))

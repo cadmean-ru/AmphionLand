@@ -60,7 +60,7 @@ func preparePrefabForEditor(pref *engine.SceneObject) {
 	pref.ForEachObject(func(object *engine.SceneObject) {
 		for _, c := range object.GetComponents(true) {
 			if componentIsNotNecessary(c) {
-				engine.LogDebug("Removing component %s", c.GetName())
+				engine.LogDebug("Removing component %s", engine.NameOfComponent(c))
 				object.RemoveComponent(c)
 			}
 		}
@@ -71,5 +71,5 @@ func componentIsNotNecessary(c engine.Component) bool {
 	_, isView := c.(engine.ViewComponent)
 	_, isLayout := c.(engine.Layout)
 
-	return !engine.ComponentNameMatches(c.GetName(), "EditorGrid") && !isView && !isLayout
+	return !engine.ComponentNameMatches(engine.NameOfComponent(c), "EditorGrid") && !isView && !isLayout
 }

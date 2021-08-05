@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/cadmean-ru/amphion/common/a"
+	"github.com/cadmean-ru/amphion/common/atext"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 	"github.com/cadmean-ru/amphion/rendering"
@@ -24,8 +25,8 @@ func (s CheckItem) Text() string {
 type CheckBoxGroup struct {
 	builtin.GridLayout
 	selectedIndexes []int
-	items []CheckItem
-	initialized bool
+	items           []CheckItem
+	initialized     bool
 }
 
 func (s *CheckBoxGroup) OnInit(ctx engine.InitContext) {
@@ -83,9 +84,9 @@ func (s *CheckBoxGroup) SetNotSelected(index int) {
 		return
 	}
 
-	s.selectedIndexes[indexPos] = s.selectedIndexes[len(s.selectedIndexes) - 1]
-	s.selectedIndexes[len(s.selectedIndexes) - 1] = -1
-	s.selectedIndexes = s.selectedIndexes[:len(s.selectedIndexes) - 1]
+	s.selectedIndexes[indexPos] = s.selectedIndexes[len(s.selectedIndexes)-1]
+	s.selectedIndexes[len(s.selectedIndexes)-1] = -1
+	s.selectedIndexes = s.selectedIndexes[:len(s.selectedIndexes)-1]
 
 	if !s.initialized {
 		return
@@ -119,7 +120,7 @@ func (s *CheckBoxGroup) updateItems() {
 			s.SceneObject.AddChild(itemObj)
 		}
 	} else if len(s.items) < s.SceneObject.GetChildrenCount() {
-		for i := s.SceneObject.GetChildrenCount()-1; i >= len(s.items); i-- {
+		for i := s.SceneObject.GetChildrenCount() - 1; i >= len(s.items); i-- {
 			c := s.SceneObject.GetChildren()
 			s.SceneObject.RemoveChild(c[i])
 		}
@@ -140,17 +141,19 @@ func (s *CheckBoxGroup) GetName() string {
 func NewCheckBoxGroup() *CheckBoxGroup {
 	return &CheckBoxGroup{
 		selectedIndexes: []int{},
-		items:         make([]CheckItem, 0, 3),
+		items:           make([]CheckItem, 0, 3),
 	}
 }
 
 type CheckBox struct {
 	engine.ViewImpl
-	item   CheckItem
-	group *CheckBoxGroup
-	circle int
-	text int
-	rNode *rendering.Node
+	item     CheckItem
+	group    *CheckBoxGroup
+	circleId int
+	textId   int
+	rNode    *rendering.Node
+	aFace    *atext.Face
+	aText    *atext.Text
 }
 
 func (s *CheckBox) OnInit(ctx engine.InitContext) {
@@ -158,20 +161,34 @@ func (s *CheckBox) OnInit(ctx engine.InitContext) {
 
 	s.rNode = ctx.GetRenderingNode()
 	s.group = s.SceneObject.GetParent().GetComponentByName("CheckBoxGroup", true).(*CheckBoxGroup)
+
+	font, _ := atext.ParseFont(atext.DefaultFontData)
+	s.aFace = font.NewFace(14)
+	s.layoutText()
 }
 
 func (s *CheckBox) OnStart() {
-	s.circle = s.rNode.AddPrimitive()
-	s.text = s.rNode.AddPrimitive()
+	s.circleId = s.rNode.AddPrimitive()
+	s.textId = s.rNode.AddPrimitive()
+}
+
+func (s *CheckBox) OnStop() {
+	s.rNode.RemovePrimitive(s.circleId)
+	s.rNode.RemovePrimitive(s.textId)
 }
 
 func (s *CheckBox) setItem(item CheckItem) {
 	s.item = item
 	s.ShouldRedraw = true
+	s.layoutText()
 	engine.RequestRendering()
 }
 
-func (s *CheckBox) OnDraw(ctx engine.DrawingContext) {
+func (s *CheckBox) layoutText() {
+	s.aText = atext.LayoutRunes(s.aFace, []rune(s.item.text), s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+}
+
+func (s *CheckBox) OnDraw(_ engine.DrawingContext) {
 	circlePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveEllipse)
 	rect := s.SceneObject.Transform.GetGlobalRect()
 	pos := s.SceneObject.Transform.GetGlobalTopLeftPosition()
@@ -185,9 +202,9 @@ func (s *CheckBox) OnDraw(ctx engine.DrawingContext) {
 	} else {
 		circlePrimitive.Appearance.FillColor = a.WhiteColor()
 	}
-	s.rNode.SetPrimitive(s.circle, circlePrimitive)
+	s.rNode.SetPrimitive(s.circleId, circlePrimitive)
 
-	textPrimitive := rendering.NewTextPrimitive(s.item.text)
+	textPrimitive := rendering.NewTextPrimitive(s.item.text, s.aText)
 	textPrimitive.Transform = rendering.NewTransform()
 	textPrimitive.Transform.Position = pos.Add(a.NewVector3(15, 0, 0)).Round()
 	textPrimitive.Transform.Size = rect.GetSize().Sub(a.NewVector3(15, 0, 0)).Round()
@@ -196,7 +213,7 @@ func (s *CheckBox) OnDraw(ctx engine.DrawingContext) {
 	} else {
 		textPrimitive.Appearance.FillColor = a.NewColor("#aaa")
 	}
-	s.rNode.SetPrimitive(s.text, textPrimitive)
+	s.rNode.SetPrimitive(s.textId, textPrimitive)
 
 	s.ShouldRedraw = false
 }

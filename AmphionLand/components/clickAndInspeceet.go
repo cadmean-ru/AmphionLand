@@ -21,9 +21,9 @@ func (s *ClickAndInspeceet) OnStart() {
 	engine.LogDebug("inspeceet start")
 	engine.BindEventHandler(engine.EventMouseDown, s.handleClick)
 
-	s.editor = engine.FindComponentByName("EditorController").(*EditorController)
+	s.editor = FindEditorController(engine.GetCurrentScene())
 	s.hierarchy = engine.FindObjectByName("Hierarchy")
-	s.shape = s.SceneObject.GetComponentByName("ShapeView").(*builtin.ShapeView)
+	s.shape = builtin.GetShapeView(s.SceneObject)
 }
 
 func (s *ClickAndInspeceet) OnStop() {
@@ -180,7 +180,7 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 	cm := engine.GetInstance().GetComponentsManager()
 	for _, comp := range components {
 
-		componentsSomething := engine.NewSceneObject("King of components " + comp.GetName())
+		componentsSomething := engine.NewSceneObject("King of components " + engine.NameOfComponent(comp))
 
 		publics := cm.GetComponentState(comp)
 		componentsSomething.Transform.Size.Y = float32(30 * (len(publics) + 1))
@@ -199,9 +199,9 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		nameBoxLabel.AddComponent(nameBoxLabelText)
 		componentsSomething.AddChild(nameBoxLabel)
 
-		nameBox := engine.NewSceneObject("nameBox " + comp.GetName())
+		nameBox := engine.NewSceneObject("nameBox " + engine.NameOfComponent(comp))
 		nameBox.Transform.Size.Y = 30
-		nameBoxText := builtin.NewTextView(comp.GetName())
+		nameBoxText := builtin.NewTextView(engine.NameOfComponent(comp))
 		nameBoxText.SetVTextAlign(a.TextAlignCenter)
 		nameBoxText.SetHTextAlign(a.TextAlignRight)
 		nameBox.AddComponent(nameBoxText)

@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/cadmean-ru/amphion/common/a"
+	"github.com/cadmean-ru/amphion/common/atext"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 	"github.com/cadmean-ru/amphion/rendering"
@@ -24,8 +25,8 @@ func (s RadioItem) Text() string {
 type RadioButtonGroup struct {
 	builtin.GridLayout
 	selectedIndex int
-	items []RadioItem
-	initialized bool
+	items         []RadioItem
+	initialized   bool
 }
 
 func (s *RadioButtonGroup) OnInit(ctx engine.InitContext) {
@@ -87,7 +88,7 @@ func (s *RadioButtonGroup) updateItems() {
 			s.SceneObject.AddChild(itemObj)
 		}
 	} else if len(s.items) < s.SceneObject.GetChildrenCount() {
-		for i := s.SceneObject.GetChildrenCount()-1; i >= len(s.items); i-- {
+		for i := s.SceneObject.GetChildrenCount() - 1; i >= len(s.items); i-- {
 			c := s.SceneObject.GetChildren()
 			s.SceneObject.RemoveChild(c[i])
 		}
@@ -115,10 +116,12 @@ func NewRadioButtonGroup() *RadioButtonGroup {
 type RadioButton struct {
 	engine.ViewImpl
 	item   RadioItem
-	group *RadioButtonGroup
+	group  *RadioButtonGroup
 	circle int
-	text int
-	rNode *rendering.Node
+	text   int
+	rNode  *rendering.Node
+	aFace  *atext.Face
+	aText  *atext.Text
 }
 
 func (s *RadioButton) OnInit(ctx engine.InitContext) {
@@ -126,6 +129,10 @@ func (s *RadioButton) OnInit(ctx engine.InitContext) {
 
 	s.rNode = ctx.GetRenderingNode()
 	s.group = s.SceneObject.GetParent().GetComponentByName("RadioButtonGroup", true).(*RadioButtonGroup)
+
+	font, _ := atext.ParseFont(atext.DefaultFontData)
+	s.aFace = font.NewFace(14)
+	s.layoutText()
 }
 
 func (s *RadioButton) OnStart() {
@@ -133,13 +140,23 @@ func (s *RadioButton) OnStart() {
 	s.text = s.rNode.AddPrimitive()
 }
 
+func (s *RadioButton) OnStop() {
+	s.rNode.RemovePrimitive(s.circle)
+	s.rNode.RemovePrimitive(s.text)
+}
+
 func (s *RadioButton) setItem(item RadioItem) {
 	s.item = item
 	s.ShouldRedraw = true
+	s.layoutText()
 	engine.RequestRendering()
 }
 
-func (s *RadioButton) OnDraw(ctx engine.DrawingContext) {
+func (s *RadioButton) layoutText() {
+	s.aText = atext.LayoutRunes(s.aFace, []rune(s.item.text), s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+}
+
+func (s *RadioButton) OnDraw(_ engine.DrawingContext) {
 	circlePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveEllipse)
 	rect := s.SceneObject.Transform.GetGlobalRect()
 	pos := s.SceneObject.Transform.GetGlobalTopLeftPosition()
@@ -155,7 +172,7 @@ func (s *RadioButton) OnDraw(ctx engine.DrawingContext) {
 	}
 	s.rNode.SetPrimitive(s.circle, circlePrimitive)
 
-	textPrimitive := rendering.NewTextPrimitive(s.item.text)
+	textPrimitive := rendering.NewTextPrimitive(s.item.text, s.aText)
 	textPrimitive.Transform = rendering.NewTransform()
 	textPrimitive.Transform.Position = pos.Add(a.NewVector3(15, 0, 0)).Round()
 	textPrimitive.Transform.Size = rect.GetSize().Sub(a.NewVector3(15, 0, 0)).Round()
