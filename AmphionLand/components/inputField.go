@@ -10,15 +10,16 @@ import (
 
 type InputField struct {
 	engine.ComponentImpl
-	font *atext.Font
-	face *atext.Face
-	textView *builtin.TextView
-	text []rune
-	cursor Cursor
-	at *atext.Text
-	buffer string
-	noEnter bool
-	someAction func()
+	font           *atext.Font
+	face           *atext.Face
+	textView       *builtin.TextView
+	text           []rune
+	cursor         Cursor
+	at             *atext.Text
+	buffer         string
+	allowParagraph bool
+	lastInput      string
+	someAction     func()
 }
 
 type Cursor struct {
@@ -33,26 +34,41 @@ func (s *InputField) CursorUpdate() {
 		if s.cursor.indexChar < -1 && s.cursor.indexLine > 0 {
 			s.cursor.indexLine--
 			s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
+			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
+			s.UpdateCursorPosition(char)
 		} else if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 { // перенос курсора на другую строчку
 			s.cursor.indexChar = 0
 			s.cursor.indexLine++
-		} else
-
-		if s.cursor.indexChar > -1 { // новые координаты курсора по индексам
 			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
-			var x = char.GetX() + char.GetGlyph().GetWidth()
-			var y = char.GetY()
-			s.cursor.cursorObj.SetPositionXy(float32(x), float32(y))
+			s.UpdateCursorPosition(char)
+		} else if s.cursor.indexChar > -1 { // новые координаты курсора по индексам
+			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
+			s.UpdateCursorPosition(char)
 		} else {
 			char := s.at.GetCharAt(s.GetIndexInText(s.cursor) + 1)
 			if char != nil {
-				var x = char.GetX()
-				var y = char.GetY()
-				s.cursor.cursorObj.SetPositionXy(float32(x), float32(y))
+				s.UpdateCursorPosition(char)
 			}
 		}
 		engine.LogDebug("l=%v c=%v", s.cursor.indexLine, s.cursor.indexChar)
 	}
+}
+
+func (s * InputField) GetInputWidth(inputString string) int {
+	newatext := atext.LayoutRunes(s.face, []rune(inputString), s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+	width := 0
+	for i := 0; i < newatext.GetCharsCount(); i++ {
+		width += newatext.GetCharAt(i).GetGlyph().GetWidth()
+	}
+	return width
+}
+
+func (s *InputField) UpdateCursorPosition(char *atext.Char){
+	lineY := s.cursor.indexLine * s.face.GetLineHeight()
+	var x = char.GetX() + char.GetGlyph().GetWidth()
+	var y = lineY
+	pos := a.NewVector3(float32(x), float32(y), 0)
+	s.cursor.cursorObj.SetPositionXyz(pos.X - s.SceneObject.Transform.GetGlobalPosition().X, float32(y), 0)
 }
 
 func (s *InputField) GetIndexInText(cursor Cursor) int {
@@ -71,7 +87,6 @@ func (s *InputField) GetIndexInText(cursor Cursor) int {
 	return -1
 }
 
-
 func (s *InputField) SetText(text string) {
 	//if len(text) == 0 {return}
 	s.text = []rune(text)
@@ -80,21 +95,29 @@ func (s *InputField) SetText(text string) {
 }
 
 func (s *InputField) Input(inputString string){
-	newatext := atext.LayoutRunes(s.face, []rune(inputString), s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
-	width := 0
-	for i := 0; i < newatext.GetCharsCount(); i++ {
-		width += newatext.GetCharAt(i).GetGlyph().GetWidth()
+	s.lastInput = inputString
+	width := s.GetInputWidth(inputString)
+	s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+	if !s.allowParagraph {
+		if float32(s.at.GetLineAt(0).GetSize().X + width) < s.SceneObject.Transform.Size.X {
+			s.InsertInput(inputString)
+		}
+	} else {
+		s.InsertInput(inputString)
 	}
-	if s.noEnter && float32(s.at.GetLineAt(0).GetSize().X + width) < s.SceneObject.Transform.Size.X{
+}
+
+func (s *InputField) InsertInput(inputString string){
+	for i := 0; i < len(inputString); i++ {
 		textCopy := make([]rune, len(s.text))
 		copy(textCopy, s.text)
 		head := textCopy[:s.GetIndexInText(s.cursor) + 1]
 		tail := s.text[s.GetIndexInText(s.cursor) + 1:]
-		head = append(head, []rune(inputString)...)
+		head = append(head, []rune(string(inputString[i]))...)
 		s.text = append(head, tail...)
 
 		s.textView.SetText(string(s.text))
-		s.cursor.indexChar+=len(inputString)
+		s.cursor.indexChar++
 		s.CursorUpdate()
 	}
 }
@@ -102,9 +125,8 @@ func (s *InputField) Input(inputString string){
 func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
 
-	s.noEnter = true
-	//s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("TextView", true).(*builtin.TextView)
-	s.textView = builtin.GetTextView(s.SceneObject.GetChildByName("main text"), true)
+	s.allowParagraph = true
+	s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("TextView", true).(*builtin.TextView)
 
 	s.font, _ = atext.ParseFont(atext.DefaultFontData)
 	s.face = s.font.NewFace(int(s.textView.FontSize))
@@ -143,6 +165,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 		if len(s.text) <= 0{
 			return true
 		}
+		s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
 		mousePos := clickEvent.MouseEventData().MousePosition
 		mousePosX := mousePos.X
 		mousePosY :=  mousePos.Y
@@ -174,7 +197,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 			return true
 		}
 		if keyDownEvent.Data != nil {
-
 			pressedKey := keyDownEvent.StringData()
 			engine.LogDebug(pressedKey)
 			switch prefix:= pressedKey; prefix {
@@ -189,7 +211,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 				}
 			case "v":
 				if engine.GetInputManager().IsKeyPressed(engine.KeyLeftControl) ||
-								engine.GetInputManager().IsKeyPressed(engine.KeyRightControl) {
+					engine.GetInputManager().IsKeyPressed(engine.KeyRightControl) {
 					var err error
 					s.buffer, err = clipboard.ReadAll()
 					if err!=nil {
@@ -233,7 +255,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 				}
 
 			case "Enter": {
-				if s.noEnter {
+				if s.allowParagraph {
 					s.someAction()
 				} else {
 					s.text = append(s.text, '\n')
@@ -241,7 +263,7 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 					s.cursor.indexChar = -1
 					s.cursor.indexLine++
 				}
-				}
+			}
 			case "LeftArrow":{
 				if s.GetIndexInText(s.cursor) >= 0 {
 					if s.cursor.indexChar == -1 {
@@ -289,10 +311,12 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 }
 
 func (s *InputField) OnStart() {
+	text := []rune("")
 	if len(s.text) > 0 {
-		s.at = atext.LayoutRunes(s.face, s.text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
-		s.textView.SetText(string(s.text))
+		text = s.text
 	}
+	s.at = atext.LayoutRunes(s.face, text, s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+	s.textView.SetText(string(text))
 }
 
 func (s *InputField) GetName() string {

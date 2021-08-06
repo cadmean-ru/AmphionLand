@@ -220,7 +220,7 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			stateInput, _ := engine.LoadPrefab(res.Prefabs_inputBox)
 			stateInput.Transform.Size.Y = 30
 			inputField := stateInput.FindComponentByName("InputField", true).(*InputField)
-			inputField.noEnter = true
+			inputField.allowParagraph = true
 			inputField.SetText(require.String(public))
 			inputField.someAction = func() {
 				switch public.(type) {
