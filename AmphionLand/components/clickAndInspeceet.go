@@ -231,15 +231,17 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			}
 			inputField.SetText(require.String(public))
 			inputField.someAction = func() {
-				switch public.(type) {
+				typeInput := public
+				nameInput := name
+				switch typeInput.(type) {
 				case string:
-					publics[name] = string(inputField.text)
+					publics[nameInput] = string(inputField.text)
 				case int, int32, int64, uint, uint8:
-					publics[name] = require.Int(inputField.text)
+					publics[nameInput] = require.Int(inputField.text)
 				case float32:
-					publics[name] = require.Float32(inputField.text)
+					publics[nameInput] = require.Float32(inputField.text)
 				case float64:
-					publics[name] = require.Float64(inputField.text)
+					publics[nameInput] = require.Float64(inputField.text)
 				}
 
 				engine.GetInstance().GetComponentsManager().SetComponentState(comp, publics)
@@ -252,7 +254,6 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			engine.LogDebug("pub %s %v", name, public)
 		}
 	}
-
 	//if object.GetName() == "Horizontal grid" {
 	//	engine.LogDebug("clicked on hg")
 	//	gridObject := engine.NewSceneObject("grid bruh")
