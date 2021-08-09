@@ -221,12 +221,27 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			stateInput.Transform.Size.Y = 30
 			inputField := stateInput.FindComponentByName("InputField", true).(*InputField)
 			inputField.allowParagraph = false
+			switch public.(type) {
+				case string:
+					inputField.varType = stringType
+				case int, int32, int64, uint, uint8:
+					inputField.varType = intType
+				case float32, float64:
+					inputField.varType = floatType
+			}
 			inputField.SetText(require.String(public))
 			inputField.someAction = func() {
 				switch public.(type) {
 				case string:
 					publics[name] = string(inputField.text)
+				case int, int32, int64, uint, uint8:
+					publics[name] = require.Int(inputField.text)
+				case float32:
+					publics[name] = require.Float32(inputField.text)
+				case float64:
+					publics[name] = require.Float64(inputField.text)
 				}
+
 				engine.GetInstance().GetComponentsManager().SetComponentState(comp, publics)
 
 				engine.ForceAllViewsRedraw()

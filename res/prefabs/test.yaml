@@ -2,7 +2,7 @@ children: []
 components:
   - name: AmphionLand/components.Test2
     state:
-      Text: "test"
+      Text: 69.4
 id: 0
 name: Test
 transform:

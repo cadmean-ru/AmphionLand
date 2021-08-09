@@ -4,7 +4,7 @@ import "github.com/cadmean-ru/amphion/engine"
 
 type Test2 struct {
 	engine.ViewImpl
-	Text string `state`
+	Text float64 `state:"text69"`
 }
 
 func (s *Test2) OnInit(ctx engine.InitContext) {
