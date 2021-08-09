@@ -4,6 +4,7 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/common/atext"
+	"github.com/cadmean-ru/amphion/common/shape"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 	"regexp"
@@ -150,10 +151,13 @@ func (s *InputField) InsertInput(inputString string) {
 
 func (s *InputField) OnInit(ctx engine.InitContext) {
 	s.ComponentImpl.OnInit(ctx)
+
 	s.regInt = regexp.MustCompile("[0-9]")
 	s.regFloat = regexp.MustCompile("[0-9.]")
 	s.allowParagraph = true
-	// s.textView = s.SceneObject.GetChildByName("main text").GetComponentByName("TextView", true).(*builtin.TextView)
+
+	s.SceneObject.AddComponent(builtin.NewClipArea(shape.Rectangle))
+
 	s.textView = builtin.GetTextView(s.SceneObject.GetChildByName("main text"), true)
 
 	s.font, _ = atext.ParseFont(atext.DefaultFontData)
