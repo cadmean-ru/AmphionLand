@@ -1,0 +1,23 @@
+children: []
+components:
+  - name: AmphionLand/components.CheckBoxGroup
+    state: {}
+id: 0
+name: Check Box
+transform:
+  pivot:
+    x: 0
+    "y": 0
+    z: 0
+  position:
+    x: 0
+    "y": 0
+    z: 2
+  rotation:
+    x: 0
+    "y": 0
+    z: 0
+  size:
+    x: 100
+    "y": 100
+    z: 0

@@ -6,3 +6,4 @@ horizontalYeeter
 textLabel
 imageBox
 test
+checkBox
