@@ -12,9 +12,10 @@ import (
 
 type ClickAndInspeceet struct {
 	engine.ComponentImpl
-	editor *EditorController
+	editor    *EditorController
 	hierarchy *engine.SceneObject
-	shape *builtin.ShapeView
+	shape     *builtin.ShapeView
+	cm        *engine.ComponentsManager
 }
 
 func (s *ClickAndInspeceet) OnStart() {
@@ -24,6 +25,8 @@ func (s *ClickAndInspeceet) OnStart() {
 	s.editor = FindEditorController(engine.GetCurrentScene())
 	s.hierarchy = engine.FindObjectByName("Hierarchy")
 	s.shape = builtin.GetShapeView(s.SceneObject)
+
+	s.cm = engine.GetInstance().GetComponentsManager()
 }
 
 func (s *ClickAndInspeceet) OnStop() {
@@ -120,7 +123,7 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 	objectNameBox.AddComponent(objectNameBoxText)
 	s.hierarchy.AddChild(objectNameBox)
 
-	transMap := map[string]a.Vector3 {
+	transMap := map[string]a.Vector3{
 		"Position": object.Transform.Position,
 		"Rotation": object.Transform.Rotation,
 		"Size":     object.Transform.Size,
@@ -150,7 +153,7 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 		nameMap := [3]string{"X", "Y", "Z"}
 		valueMap := [3]float32{vec.X, vec.Y, vec.Z}
 
-		for j := 0; j < 3; j++{
+		for j := 0; j < 3; j++ {
 			name := engine.NewSceneObject("name" + string(rune(i)) + string(rune(j)))
 			nameText := builtin.NewTextView(nameMap[j])
 			nameText.SetVTextAlign(a.TextAlignCenter)
@@ -160,7 +163,7 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			name.Transform.Size.Y = 30
 
 			value := engine.NewSceneObject("value" + string(rune(i)) + string(rune(j)))
-			valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f',3,32))
+			valueText := builtin.NewTextView(strconv.FormatFloat(float64(valueMap[j]), 'f', 3, 32))
 			valueText.SetVTextAlign(a.TextAlignCenter)
 			valueText.SetHTextAlign(a.TextAlignCenter)
 
@@ -177,12 +180,12 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 	}
 
 	components := object.GetComponents()
-	cm := engine.GetInstance().GetComponentsManager()
+
 	for _, comp := range components {
 
 		componentsSomething := engine.NewSceneObject("King of components " + engine.NameOfComponent(comp))
 
-		publics := cm.GetComponentState(comp)
+		publics := s.cm.GetComponentState(comp)
 		componentsSomething.Transform.Size.Y = float32(30 * (len(publics) + 1))
 		componentsSomething.AddComponent(builtin.NewBoundaryView())
 		grid := builtin.NewGridLayout()
@@ -217,48 +220,74 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			stateLabel.AddComponent(stateLabelText)
 			componentsSomething.AddChild(stateLabel)
 
-			stateInput, _ := engine.LoadPrefab(res.Prefabs_inputBox)
-			stateInput.Transform.Size.Y = 30
-			inputField := stateInput.FindComponentByName("InputField", true).(*InputField)
-			inputField.allowParagraph = false
 			switch public.(type) {
-				case string:
-					inputField.varType = stringType
-				case int, int32, int64, uint, uint8:
-					inputField.varType = intType
-				case float32, float64:
-					inputField.varType = floatType
+			case string, int, int32, int64, uint, uint8, float32, float64:
+				s.CreateInputBox(public, name, comp, componentsSomething)
+			case bool:
+				s.CreateInputBox(public, name, comp, componentsSomething)
+				//s.CreateCheckBox(public, name, comp, componentsSomething)
+			default:
+				s.CreateInputBox(public, name, comp, componentsSomething)
 			}
-			inputField.SetText(require.String(public))
 
-			typeInput := public
-			nameInput := name
-			compus := comp
-			inputField.someAction = func() {
-				var newValue interface{}
-				switch typeInput.(type) {
-				case string:
-					newValue = require.String(inputField.text)
-				case int, int32, int64, uint, uint8:
-					newValue = require.Int(inputField.text)
-				case a.TextAlign:
-					newValue = a.TextAlign(require.Byte(inputField.text))
-				case float32:
-					newValue = require.Float32(inputField.text)
-				case float64:
-					newValue = require.Float64(inputField.text)
-				}
-
-				compusState := cm.GetComponentState(compus)
-				compusState[nameInput] = newValue
-				cm.SetComponentState(compus, compusState)
-
-				engine.ForceAllViewsRedraw()
-				engine.RequestRendering()
-			}
-			componentsSomething.AddChild(stateInput)
 
 			engine.LogDebug("pub %s %v", name, public)
 		}
 	}
+}
+
+func (s *ClickAndInspeceet) CreateCheckBox(public interface{}, name string, comp engine.Component,
+componentsSomething *engine.SceneObject) {
+	//stateCheck, _ := engine.LoadPrefab(res.Prefabs_checkBox)
+	//checkBoxGroup := stateCheck.FindComponentByName("CheckBoxGroup", true).(*CheckBoxGroup)
+	//checkBoxGroup.AddItem(name)
+	//checkBoxGroup.SetSelected(0)
+	//engine.LogDebug("%v", checkBoxGroup.GetItemIndex(name))
+	//
+	//engine.ForceAllViewsRedraw()
+	//engine.RequestRendering()
+	//componentsSomething.AddChild(stateCheck)
+}
+
+
+func (s *ClickAndInspeceet) CreateInputBox(public interface{}, name string, comp engine.Component,
+componentsSomething *engine.SceneObject) {
+	stateInput, _ := engine.LoadPrefab(res.Prefabs_inputBox)
+	stateInput.Transform.Size.Y = 30
+	inputField := stateInput.FindComponentByName("InputField", true).(*InputField)
+	inputField.allowParagraph = false
+	switch public.(type) {
+	case string:
+		inputField.varType = stringType
+	case int, int32, int64, uint, uint8:
+		inputField.varType = intType
+	case float32, float64:
+		inputField.varType = floatType
+	}
+	inputField.SetText(require.String(public))
+
+	typeInput := public
+	nameInput := name
+	compus := comp
+	inputField.someAction = func() {
+		var newValue interface{}
+		switch typeInput.(type) {
+		case string:
+			newValue = require.String(inputField.text)
+		case int, int32, int64, uint, uint8:
+			newValue = require.Int(inputField.text)
+		case a.TextAlign:
+			newValue = a.TextAlign(require.Byte(inputField.text))
+		case float32:
+			newValue = require.Float32(inputField.text)
+		case float64:
+			newValue = require.Float64(inputField.text)
+		}
+		compusState := s.cm.GetComponentState(compus)
+		compusState[nameInput] = newValue
+		s.cm.SetComponentState(compus, compusState)
+	}
+	engine.ForceAllViewsRedraw()
+	engine.RequestRendering()
+	componentsSomething.AddChild(stateInput)
 }

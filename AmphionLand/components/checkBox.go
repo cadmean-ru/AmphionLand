@@ -95,6 +95,15 @@ func (s *CheckBoxGroup) SetNotSelected(index int) {
 	s.updateItems()
 }
 
+func (s *CheckBoxGroup) GetItemIndex(text string) int {
+	for i:=0; i< len(s.items); i++ {
+		if s.items[i].text == text {
+			return s.items[i].index
+		}
+	}
+	return -1
+}
+
 func (s *CheckBoxGroup) updateItems() {
 	if len(s.items) > s.SceneObject.GetChildrenCount() {
 		for i := s.SceneObject.GetChildrenCount(); i < len(s.items); i++ {
