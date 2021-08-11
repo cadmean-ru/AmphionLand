@@ -49,7 +49,7 @@ func (s *InputField) CursorUpdate() {
 			s.cursor.indexChar = s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1
 			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
 			s.UpdateCursorPosition(char)
-		} else if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine).GetCharsCount()-1 { // перенос курсора на другую строчку
+		} else if s.cursor.indexChar > s.at.GetLineAt(s.cursor.indexLine).GetCharsCount() - 1 { // перенос курсора на другую строчку
 			s.cursor.indexChar = 0
 			s.cursor.indexLine++
 			char := s.at.GetCharAt(s.GetIndexInText(s.cursor))
@@ -59,9 +59,9 @@ func (s *InputField) CursorUpdate() {
 			s.UpdateCursorPosition(char)
 		} else {
 			char := s.at.GetCharAt(s.GetIndexInText(s.cursor) + 1)
-			if char != nil {
+			//if char != nil {
 				s.UpdateCursorPosition(char)
-			}
+			//}
 		}
 		engine.LogDebug("l=%v c=%v", s.cursor.indexLine, s.cursor.indexChar)
 	}
@@ -78,10 +78,19 @@ func (s *InputField) GetInputWidth(inputString string) int {
 
 func (s *InputField) UpdateCursorPosition(char *atext.Char) {
 	lineY := s.cursor.indexLine * s.face.GetLineHeight()
-	var x = char.GetX() + char.GetSize().X
 	var y = lineY
-	pos := a.NewVector3(float32(x), float32(y), 0)
-	s.cursor.cursorObj.SetPositionXyz(pos.X-s.SceneObject.Transform.GetGlobalPosition().X, float32(y), 0)
+	if char != nil {
+		if s.cursor.indexChar > -1 {
+			var x = char.GetX() + char.GetSize().X
+			pos := a.NewVector3(float32(x), float32(y), 0)
+			s.cursor.cursorObj.SetPositionXyz(pos.X-s.SceneObject.Transform.GetGlobalPosition().X, float32(y), 0)
+		} else {
+			var x = char.GetX()
+			pos := a.NewVector3(float32(x), float32(y), 0)
+			s.cursor.cursorObj.SetPositionXyz(pos.X-s.SceneObject.Transform.GetGlobalPosition().X, float32(y), 0)
+		}
+
+	}
 }
 
 func (s *InputField) GetIndexInText(cursor Cursor) int {
@@ -181,7 +190,6 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 		if !s.textView.SceneObject.IsFocused() {
 			return true
 		}
-		//s.cursor.cursorObj.SetEnabled(true)
 		if keyDownEvent.Data != nil {
 			s.Input(keyDownEvent.StringData())
 		}
@@ -218,6 +226,14 @@ func (s *InputField) OnInit(ctx engine.InitContext) {
 						s.cursor.indexChar = j
 						s.CursorUpdate()
 						break
+					} else if mousePosX >= charPosX {
+						s.cursor.indexLine = i
+						s.cursor.indexChar = s.at.GetLineAt(i).GetCharsCount() - 1
+						s.CursorUpdate()
+					} else if mousePosX <= charPosX {
+						s.cursor.indexLine = i
+						s.cursor.indexChar = -1
+						s.CursorUpdate()
 					}
 				}
 				break

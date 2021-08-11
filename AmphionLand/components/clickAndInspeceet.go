@@ -224,8 +224,7 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 			case string, int, int32, int64, uint, uint8, float32, float64:
 				s.CreateInputBox(public, name, comp, componentsSomething)
 			case bool:
-				s.CreateInputBox(public, name, comp, componentsSomething)
-				//s.CreateCheckBox(public, name, comp, componentsSomething)
+				s.CreateCheckBox(public, name, comp, componentsSomething)
 			default:
 				s.CreateInputBox(public, name, comp, componentsSomething)
 			}
@@ -238,15 +237,31 @@ func (s *ClickAndInspeceet) showInspector(object *engine.SceneObject) {
 
 func (s *ClickAndInspeceet) CreateCheckBox(public interface{}, name string, comp engine.Component,
 componentsSomething *engine.SceneObject) {
-	//stateCheck, _ := engine.LoadPrefab(res.Prefabs_checkBox)
-	//checkBoxGroup := stateCheck.FindComponentByName("CheckBoxGroup", true).(*CheckBoxGroup)
-	//checkBoxGroup.AddItem(name)
-	//checkBoxGroup.SetSelected(0)
-	//engine.LogDebug("%v", checkBoxGroup.GetItemIndex(name))
-	//
-	//engine.ForceAllViewsRedraw()
-	//engine.RequestRendering()
-	//componentsSomething.AddChild(stateCheck)
+	stateCheck, _ := engine.LoadPrefab(res.Prefabs_checkBox)
+	checkBoxGroup := stateCheck.FindComponentByName("CheckBoxGroup", true).(*CheckBoxGroup)
+	checkBoxGroup.AddItem("")
+	if public == true {
+		checkBoxGroup.SetSelected(0)
+	}
+
+	nameInput := name
+	compus := comp
+	checkBoxGroup.SetOnItemSelectedListener(func(item CheckItem) {
+		compusState := s.cm.GetComponentState(compus)
+		if compusState[nameInput] == true {
+			compusState[nameInput] = false
+		} else {
+			compusState[nameInput] = true
+		}
+		s.cm.SetComponentState(compus, compusState)
+
+		engine.ForceAllViewsRedraw()
+		engine.RequestRendering()
+	})
+
+	engine.ForceAllViewsRedraw()
+	engine.RequestRendering()
+	componentsSomething.AddChild(stateCheck)
 }
 
 
@@ -286,6 +301,9 @@ componentsSomething *engine.SceneObject) {
 		compusState := s.cm.GetComponentState(compus)
 		compusState[nameInput] = newValue
 		s.cm.SetComponentState(compus, compusState)
+
+		engine.ForceAllViewsRedraw()
+		engine.RequestRendering()
 	}
 	engine.ForceAllViewsRedraw()
 	engine.RequestRendering()

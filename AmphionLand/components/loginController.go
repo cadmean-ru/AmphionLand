@@ -15,24 +15,24 @@ type LoginSceneController struct {
 func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	l.ComponentImpl.OnInit(ctx)
 
-	obj := engine.NewSceneObject("Radio butts")
-	obj.SetSizeXy(100, 100)
-	obj.SetPositionXy(10, 10)
-
-	radioButt := NewRadioButtonGroup()
-	radioButt.AddItem("test 1")
-	radioButt.AddItem("test 2")
-	radioButt.AddItem("test 3")
-
-	radioButt.SetOnItemSelectedListener(func(item RadioItem) {
-		engine.LogDebug("Selected '%s'", item.text)
-	})
-
-	radioButt.SetSelected(0)
-
-	obj.AddComponent(radioButt)
-
-	l.SceneObject.AddChild(obj)
+	//obj := engine.NewSceneObject("Radio butts")
+	//obj.SetSizeXy(100, 100)
+	//obj.SetPositionXy(10, 10)
+	//
+	//radioButt := NewRadioButtonGroup()
+	//radioButt.AddItem("test 1")
+	//radioButt.AddItem("test 2")
+	//radioButt.AddItem("test 3")
+	//
+	//radioButt.SetOnItemSelectedListener(func(item RadioItem) {
+	//	engine.LogDebug("Selected '%s'", item.text)
+	//})
+	//
+	//radioButt.SetSelected(0)
+	//
+	//obj.AddComponent(radioButt)
+	//
+	//l.SceneObject.AddChild(obj)
 	//
 	//butt, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
 	//butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
@@ -42,17 +42,17 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	//butt.Transform.Position.X = 200
 	//l.SceneObject.AddChild(butt)
 
-	//checkBoxObj := engine.NewSceneObject("Check butts")
-	//checkBoxObj.SetSizeXy(100, 100)
-	//
-	//checkButt := NewCheckBoxGroup()
-	//checkButt.AddItem("test 1")
-	//checkButt.AddItem("test 2")
-	//checkButt.AddItem("test 3")
-	//
-	//checkBoxObj.AddComponent(checkButt)
-	//
-	//l.SceneObject.AddChild(checkBoxObj)
+	checkBoxObj := engine.NewSceneObject("Check butts")
+	checkBoxObj.SetSizeXy(100, 100)
+
+	checkButt := NewCheckBoxGroup()
+	checkButt.AddItem("test 1")
+	checkButt.AddItem("test 2")
+	checkButt.AddItem("test 3")
+
+	checkBoxObj.AddComponent(checkButt)
+
+	l.SceneObject.AddChild(checkBoxObj)
 
 	//butt, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
 	//butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {

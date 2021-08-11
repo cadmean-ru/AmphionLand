@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"github.com/cadmean-ru/amphion/common"
 	"github.com/cadmean-ru/amphion/common/a"
 	"github.com/cadmean-ru/amphion/common/atext"
 	"github.com/cadmean-ru/amphion/engine"
@@ -27,17 +28,24 @@ type CheckBoxGroup struct {
 	selectedIndexes []int
 	items           []CheckItem
 	initialized     bool
+	listener        func(item CheckItem)
 }
 
 func (s *CheckBoxGroup) OnInit(ctx engine.InitContext) {
 	s.GridLayout.OnInit(ctx)
-	s.AddColumn(a.WrapContent)
+	s.AddColumn(a.FillParent)
+	s.AutoExpansion = true
+	s.AutoShrinking = true
 
 	s.initialized = true
 }
 
 func (s *CheckBoxGroup) OnStart() {
 	s.updateItems()
+}
+
+func (s *CheckBoxGroup) SetOnItemSelectedListener(listener func(item CheckItem)) {
+	s.listener = listener
 }
 
 func (s *CheckBoxGroup) AddItem(text string) {
@@ -116,11 +124,15 @@ func (s *CheckBoxGroup) updateItems() {
 					return true
 				}
 
-				check := obj.GetComponentByName("CheckBox").(*CheckBox)
+				check := GetCheckBox(obj)
 				if s.IsSelected(check.item.index) {
 					s.SetNotSelected(check.item.index)
 				} else {
 					s.SetSelected(check.item.index)
+				}
+
+				if s.listener != nil {
+					s.listener(check.item)
 				}
 
 				return true
@@ -138,13 +150,9 @@ func (s *CheckBoxGroup) updateItems() {
 	children := s.SceneObject.GetChildren()
 	for i, item := range s.items {
 		c := children[i]
-		b := c.GetComponentByName("CheckBox", true).(*CheckBox)
+		b := GetCheckBox(c, true)
 		b.setItem(item)
 	}
-}
-
-func (s *CheckBoxGroup) GetName() string {
-	return engine.NameOfComponent(s)
 }
 
 func NewCheckBoxGroup() *CheckBoxGroup {
@@ -163,17 +171,24 @@ type CheckBox struct {
 	rNode    *rendering.Node
 	aFace    *atext.Face
 	aText    *atext.Text
+	initialized   bool
+	textOffset    a.Vector3
+	prevTransform engine.Transform
 }
 
 func (s *CheckBox) OnInit(ctx engine.InitContext) {
 	s.ViewImpl.OnInit(ctx)
 
+	s.textOffset = a.NewVector3(15, 0, 0)
+
 	s.rNode = ctx.GetRenderingNode()
-	s.group = s.SceneObject.GetParent().GetComponentByName("CheckBoxGroup", true).(*CheckBoxGroup)
+	s.group = GetCheckBoxGroup(s.SceneObject.GetParent())
 
 	font, _ := atext.ParseFont(atext.DefaultFontData)
 	s.aFace = font.NewFace(14)
 	s.layoutText()
+
+	s.initialized = true
 }
 
 func (s *CheckBox) OnStart() {
@@ -189,21 +204,47 @@ func (s *CheckBox) OnStop() {
 func (s *CheckBox) setItem(item CheckItem) {
 	s.item = item
 	s.ShouldRedraw = true
+
+	if !s.initialized {
+		return
+	}
+
 	s.layoutText()
 	engine.RequestRendering()
 }
 
 func (s *CheckBox) layoutText() {
-	s.aText = atext.LayoutRunes(s.aFace, []rune(s.item.text), s.SceneObject.Transform.GetGlobalRect(), atext.LayoutOptions{})
+	pos := s.SceneObject.Transform.GetGlobalTopLeftPosition().Add(s.textOffset)
+	size := s.SceneObject.Transform.GetSize().Sub(s.textOffset)
+	rect := common.NewRectBoundaryFromPositionAndSize(pos, size)
+	s.aText = atext.LayoutRunes(s.aFace, []rune(s.item.text), rect, atext.LayoutOptions{
+		HTextAlign: a.TextAlignLeft,
+		VTextAlign: a.TextAlignCenter,
+		SingleLine: true,
+	})
+}
+
+func (s *CheckBox) GetAText() *atext.Text {
+	return s.aText
+}
+
+func (s *CheckBox) OnUpdate(_ engine.UpdateContext) {
+	if !s.ShouldDraw() && s.prevTransform.Equals(s.SceneObject.Transform) {
+		return
+	}
+
+	s.prevTransform = s.SceneObject.Transform
+
+	s.layoutText()
 }
 
 func (s *CheckBox) OnDraw(_ engine.DrawingContext) {
-	circlePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveEllipse)
 	rect := s.SceneObject.Transform.GetGlobalRect()
 	pos := s.SceneObject.Transform.GetGlobalTopLeftPosition()
 
+	circlePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveEllipse)
 	circlePrimitive.Transform = rendering.NewTransform()
-	circlePrimitive.Transform.Position = pos.Round()
+	circlePrimitive.Transform.Position = pos.Add(a.NewVector3(0, s.SceneObject.Transform.GetSize().Y/2-5, 0)).Round()
 	circlePrimitive.Transform.Size = a.NewIntVector3(10, 10, 0)
 	circlePrimitive.Appearance.StrokeColor = a.BlackColor()
 	if s.group.IsSelected(s.item.index) {
@@ -213,7 +254,7 @@ func (s *CheckBox) OnDraw(_ engine.DrawingContext) {
 	}
 	s.rNode.SetPrimitive(s.circleId, circlePrimitive)
 
-	textPrimitive := rendering.NewTextPrimitive(s.item.text, s.aText)
+	textPrimitive := rendering.NewTextPrimitive(s.item.text, s)
 	textPrimitive.Transform = rendering.NewTransform()
 	textPrimitive.Transform.Position = pos.Add(a.NewVector3(15, 0, 0)).Round()
 	textPrimitive.Transform.Size = rect.GetSize().Sub(a.NewVector3(15, 0, 0)).Round()
@@ -225,10 +266,6 @@ func (s *CheckBox) OnDraw(_ engine.DrawingContext) {
 	s.rNode.SetPrimitive(s.textId, textPrimitive)
 
 	s.ShouldRedraw = false
-}
-
-func (s *CheckBox) GetName() string {
-	return engine.NameOfComponent(s)
 }
 
 func NewCheckBox(item CheckItem) *CheckBox {
