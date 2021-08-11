@@ -1,6 +1,7 @@
 package components
 
 import (
+	"AmphionLand/res"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 )
@@ -14,6 +15,32 @@ type LoginSceneController struct {
 
 func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	l.ComponentImpl.OnInit(ctx)
+
+	obj := engine.NewSceneObject("Drip down")
+	obj.SetSizeXy(100, 100)
+	obj.SetPositionXy(10, 10)
+
+	dripDown := NewDropBoxGroup()
+	dripDown.AddItem("test 1")
+	dripDown.AddItem("test 2")
+	dripDown.AddItem("test 3")
+
+	dripDown.SetSelected(1)
+
+	dripDown.SetOnItemSelectedListener(func(item DropItem) {
+		engine.LogDebug("Selected '%s'", item.text)
+	})
+
+
+	obj.AddComponent(dripDown)
+
+	l.SceneObject.AddChild(obj)
+
+	butt, _ := engine.LoadPrefab(res.Prefabs_inputBox)
+	butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+		engine.LogDebug(dripDown.SelectedItemText())
+		return true
+	}))
 
 	//obj := engine.NewSceneObject("Radio butts")
 	//obj.SetSizeXy(100, 100)
@@ -41,18 +68,18 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 	//}))
 	//butt.Transform.Position.X = 200
 	//l.SceneObject.AddChild(butt)
-
-	checkBoxObj := engine.NewSceneObject("Check butts")
-	checkBoxObj.SetSizeXy(100, 100)
-
-	checkButt := NewCheckBoxGroup()
-	checkButt.AddItem("test 1")
-	checkButt.AddItem("test 2")
-	checkButt.AddItem("test 3")
-
-	checkBoxObj.AddComponent(checkButt)
-
-	l.SceneObject.AddChild(checkBoxObj)
+	//
+	//checkBoxObj := engine.NewSceneObject("Check butts")
+	//checkBoxObj.SetSizeXy(100, 100)
+	//
+	//checkButt := NewCheckBoxGroup()
+	//checkButt.AddItem("test 1")
+	//checkButt.AddItem("test 2")
+	//checkButt.AddItem("test 3")
+	//
+	//checkBoxObj.AddComponent(checkButt)
+	//
+	//l.SceneObject.AddChild(checkBoxObj)
 
 	//butt, _ := engine.LoadPrefab(res.Builtin_prefabs_button)
 	//butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {

@@ -164,13 +164,14 @@ func NewCheckBoxGroup() *CheckBoxGroup {
 
 type CheckBox struct {
 	engine.ViewImpl
-	item     CheckItem
-	group    *CheckBoxGroup
-	circleId int
-	textId   int
-	rNode    *rendering.Node
-	aFace    *atext.Face
-	aText    *atext.Text
+	item          CheckItem
+	group         *CheckBoxGroup
+	squareId      int
+	smallSquareId int
+	textId        int
+	rNode         *rendering.Node
+	aFace         *atext.Face
+	aText         *atext.Text
 	initialized   bool
 	textOffset    a.Vector3
 	prevTransform engine.Transform
@@ -192,12 +193,14 @@ func (s *CheckBox) OnInit(ctx engine.InitContext) {
 }
 
 func (s *CheckBox) OnStart() {
-	s.circleId = s.rNode.AddPrimitive()
+	s.squareId = s.rNode.AddPrimitive()
+	s.smallSquareId = s.rNode.AddPrimitive()
 	s.textId = s.rNode.AddPrimitive()
 }
 
 func (s *CheckBox) OnStop() {
-	s.rNode.RemovePrimitive(s.circleId)
+	s.rNode.RemovePrimitive(s.squareId)
+	s.rNode.RemovePrimitive(s.smallSquareId)
 	s.rNode.RemovePrimitive(s.textId)
 }
 
@@ -242,17 +245,25 @@ func (s *CheckBox) OnDraw(_ engine.DrawingContext) {
 	rect := s.SceneObject.Transform.GetGlobalRect()
 	pos := s.SceneObject.Transform.GetGlobalTopLeftPosition()
 
-	circlePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveEllipse)
-	circlePrimitive.Transform = rendering.NewTransform()
-	circlePrimitive.Transform.Position = pos.Add(a.NewVector3(0, s.SceneObject.Transform.GetSize().Y/2-5, 0)).Round()
-	circlePrimitive.Transform.Size = a.NewIntVector3(10, 10, 0)
-	circlePrimitive.Appearance.StrokeColor = a.BlackColor()
+	squarePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveRectangle)
+	squarePrimitive.Transform = rendering.NewTransform()
+	squarePrimitive.Transform.Position = pos.Add(a.NewVector3(0, s.SceneObject.Transform.GetSize().Y/2-5, 0)).Round()
+	squarePrimitive.Transform.Size = a.NewIntVector3(10, 10, 0)
+	squarePrimitive.Appearance.StrokeColor = a.BlackColor()
+
+	smallSquarePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveRectangle)
+	smallSquarePrimitive.SetTransform(rendering.NewTransform())
+	smallSquarePrimitive.Transform.Position = pos.Add(a.NewVector3(float32(squarePrimitive.Transform.Size.X/2), float32(squarePrimitive.Transform.Size.Y/2), 1)).Round()
+
+	smallSquarePrimitive.Transform.Size = a.NewIntVector3(5, 5, 0)
+	smallSquarePrimitive.Appearance.StrokeColor = a.BlackColor()
 	if s.group.IsSelected(s.item.index) {
-		circlePrimitive.Appearance.FillColor = a.PinkColor()
+		smallSquarePrimitive.Appearance.FillColor = a.PinkColor()
 	} else {
-		circlePrimitive.Appearance.FillColor = a.WhiteColor()
+		smallSquarePrimitive.Appearance.FillColor = a.WhiteColor()
 	}
-	s.rNode.SetPrimitive(s.circleId, circlePrimitive)
+	s.rNode.SetPrimitive(s.squareId, squarePrimitive)
+	s.rNode.SetPrimitive(s.smallSquareId, smallSquarePrimitive)
 
 	textPrimitive := rendering.NewTextPrimitive(s.item.text, s)
 	textPrimitive.Transform = rendering.NewTransform()
