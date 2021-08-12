@@ -1,7 +1,6 @@
 package components
 
 import (
-	"AmphionLand/res"
 	"github.com/cadmean-ru/amphion/engine"
 	"github.com/cadmean-ru/amphion/engine/builtin"
 )
@@ -36,11 +35,11 @@ func (l *LoginSceneController) OnInit(ctx engine.InitContext) {
 
 	l.SceneObject.AddChild(obj)
 
-	butt, _ := engine.LoadPrefab(res.Prefabs_inputBox)
-	butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
-		engine.LogDebug(dripDown.SelectedItemText())
-		return true
-	}))
+	//butt, _ := engine.LoadPrefab(res.Prefabs_inputBox)
+	//butt.AddComponent(builtin.NewEventListener(engine.EventMouseDown, func(event engine.AmphionEvent) bool {
+	//	engine.LogDebug(dripDown.SelectedItemText())
+	//	return true
+	//}))
 
 	//obj := engine.NewSceneObject("Radio butts")
 	//obj.SetSizeXy(100, 100)

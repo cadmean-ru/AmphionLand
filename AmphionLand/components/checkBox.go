@@ -247,20 +247,21 @@ func (s *CheckBox) OnDraw(_ engine.DrawingContext) {
 
 	squarePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveRectangle)
 	squarePrimitive.Transform = rendering.NewTransform()
-	squarePrimitive.Transform.Position = pos.Add(a.NewVector3(0, s.SceneObject.Transform.GetSize().Y/2-5, 0)).Round()
-	squarePrimitive.Transform.Size = a.NewIntVector3(10, 10, 0)
+	squarePrimitive.Transform.Position = pos.Add(a.NewVector3(0, s.SceneObject.Transform.Size.Y/2 - 5, 0)).Round()
+	squarePrimitive.Transform.Size = a.NewIntVector3(20, 20, 0)
 	squarePrimitive.Appearance.StrokeColor = a.BlackColor()
 
 	smallSquarePrimitive := rendering.NewGeometryPrimitive(rendering.PrimitiveRectangle)
 	smallSquarePrimitive.SetTransform(rendering.NewTransform())
-	smallSquarePrimitive.Transform.Position = pos.Add(a.NewVector3(float32(squarePrimitive.Transform.Size.X/2), float32(squarePrimitive.Transform.Size.Y/2), 1)).Round()
+	smallSquarePrimitive.Transform.Position = pos.Add(a.NewVector3(float32(squarePrimitive.Transform.Size.X)/4, float32(s.SceneObject.Transform.Size.Y/2)-5.0+float32(squarePrimitive.Transform.Size.Y/4), 3)).Round()
 
-	smallSquarePrimitive.Transform.Size = a.NewIntVector3(5, 5, 0)
-	smallSquarePrimitive.Appearance.StrokeColor = a.BlackColor()
+	smallSquarePrimitive.Transform.Size = a.NewIntVector3(squarePrimitive.Transform.Size.X/2, squarePrimitive.Transform.Size.Y/2, 0)
 	if s.group.IsSelected(s.item.index) {
 		smallSquarePrimitive.Appearance.FillColor = a.PinkColor()
+		smallSquarePrimitive.Appearance.StrokeColor = a.BlackColor()
 	} else {
 		smallSquarePrimitive.Appearance.FillColor = a.WhiteColor()
+		smallSquarePrimitive.Appearance.StrokeColor = a.WhiteColor()
 	}
 	s.rNode.SetPrimitive(s.squareId, squarePrimitive)
 	s.rNode.SetPrimitive(s.smallSquareId, smallSquarePrimitive)
